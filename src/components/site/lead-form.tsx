@@ -1,6 +1,6 @@
 import { useRef, useState, type FormEvent } from "react";
 
-import { submitLead } from "@/lib/api/leads.functions";
+import { SITE } from "@/lib/site-config";
 
 import { PHONE_RE, PRODUCTS, formatPhone, type Product } from "./shared";
 
@@ -72,19 +72,8 @@ export function LeadForm() {
     }
     setStatus("submitting");
     try {
-      await submitLead({
-        data: {
-          name: name.trim(),
-          phone: phone.trim(),
-          products,
-          contactTime: "any",
-          consent: true,
-          consentThird: true,
-          marketing,
-          source: "form",
-          website,
-        },
-      });
+      // Draft page: nothing is sent anywhere yet. Connect a real endpoint here later.
+      await new Promise((resolve) => setTimeout(resolve, 500));
       setStatus("success");
       requestAnimationFrame(() => doneRef.current?.focus());
     } catch {
@@ -106,12 +95,14 @@ export function LeadForm() {
   if (status === "success") {
     return (
       <div className="lf-done" ref={doneRef} role="status" tabIndex={-1}>
-        <p className="lf-done__title">상담 신청이 접수됐어요</p>
+        <p className="lf-done__title">지금은 시안 페이지예요</p>
         <p className="lf-done__text">
-          {name.trim()}님, 남겨주신 번호로 영업일 기준 하루 안에 연락드릴게요.
+          {name.trim()}님, 입력해 주셔서 감사해요. 이 페이지에서는 아직 신청이 접수되지 않아요.
+          <br />
+          상담은 <a href={`tel:${SITE.phoneTel}`}>{SITE.phone}</a>로 전화 주세요.
         </p>
         <button className="lf-done__again" onClick={reset} type="button">
-          다른 번호로 다시 신청하기
+          다시 입력하기
         </button>
       </div>
     );

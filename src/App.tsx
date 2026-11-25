@@ -1,5 +1,3 @@
-import { createFileRoute } from "@tanstack/react-router";
-
 import {
   Compare,
   Consult,
@@ -17,13 +15,7 @@ import {
 import { QuickBar } from "@/components/site/quick-bar";
 import { ToTop } from "@/components/site/to-top";
 
-export const Route = createFileRoute("/")({
-  component: Index,
-});
-
-// Mobile-first single column (max 480px). On wide screens the column sits
-// centered on the brand backdrop.
-function Index() {
+export function App() {
   return (
     <div className="stage">
       <main className="page">

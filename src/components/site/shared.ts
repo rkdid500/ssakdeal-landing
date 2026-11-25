@@ -1,21 +1,23 @@
+import { asset } from "@/lib/asset";
+
 export type Product = "internet" | "mobile";
 
 export const ART = {
-  router: "/assets/3d/router.webp",
-  phone: "/assets/3d/phone.webp",
-  gift: "/assets/3d/gift.webp",
-  magnifier: "/assets/3d/magnifier.webp",
-  moneybag: "/assets/3d/moneybag.webp",
-  calendar: "/assets/3d/calendar.webp",
-  clipboard: "/assets/3d/clipboard.webp",
-  trophy: "/assets/3d/trophy.webp",
-  ssakSearch: "/assets/brand/ssak-00.webp",
-  ssakCheck: "/assets/brand/ssak-01.webp",
-  ssakWave: "/assets/brand/ssak-02.webp",
-  ssakHappy: "/assets/brand/ssak-03.webp",
-  ssakLook: "/assets/brand/ssak-04.webp",
-  coins: "/assets/3d/coins.webp",
-  chat: "/assets/3d/chat.webp",
+  router: asset("/assets/3d/router.webp"),
+  phone: asset("/assets/3d/phone.webp"),
+  gift: asset("/assets/3d/gift.webp"),
+  magnifier: asset("/assets/3d/magnifier.webp"),
+  moneybag: asset("/assets/3d/moneybag.webp"),
+  calendar: asset("/assets/3d/calendar.webp"),
+  clipboard: asset("/assets/3d/clipboard.webp"),
+  trophy: asset("/assets/3d/trophy.webp"),
+  ssakSearch: asset("/assets/brand/ssak-00.webp"),
+  ssakCheck: asset("/assets/brand/ssak-01.webp"),
+  ssakWave: asset("/assets/brand/ssak-02.webp"),
+  ssakHappy: asset("/assets/brand/ssak-03.webp"),
+  ssakLook: asset("/assets/brand/ssak-04.webp"),
+  coins: asset("/assets/3d/coins.webp"),
+  chat: asset("/assets/3d/chat.webp"),
 } as const;
 
 export const PRODUCTS: { value: Product; label: string; art: string }[] = [

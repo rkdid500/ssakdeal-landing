@@ -36,7 +36,7 @@ export function Hero() {
     <section className="hero" id="top">
       <p className="hero__strip">합리적인 요금, 끝까지 챙기는 혜택</p>
       <div className="hero__head">
-        <a aria-label={`${SITE.name} 처음으로`} className="brand" href="/">
+        <a aria-label={`${SITE.name} 처음으로`} className="brand" href={import.meta.env.BASE_URL}>
           <BrandLogo height={30} />
         </a>
         <Art className="hero__mascot float" eager size={92} src={ART.ssakWave} />

@@ -1,6 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
 
-import { submitLead } from "@/lib/api/leads.functions";
 import { SITE } from "@/lib/site-config";
 
 import { PHONE_RE, formatPhone, type Product } from "./shared";
@@ -41,17 +40,9 @@ export function QuickBar() {
     }
     setSubmitting(true);
     try {
-      await submitLead({
-        data: {
-          name: name.trim(),
-          phone: phone.trim(),
-          products: CHOICES.find((c) => c.value === product)?.products ?? ["internet"],
-          contactTime: "any",
-          consent: true,
-          source: "bar",
-        },
-      });
-      setMessage({ tone: "ok", text: `${name.trim()}님, 접수됐어요. 곧 연락드릴게요.` });
+      // Draft page: nothing is sent anywhere yet.
+      await new Promise((resolve) => setTimeout(resolve, 400));
+      setMessage({ tone: "ok", text: `시안 페이지라 아직 접수되지 않아요. 상담은 ${SITE.phone}로 전화 주세요.` });
       setProduct("");
       setName("");
       setPhone("");

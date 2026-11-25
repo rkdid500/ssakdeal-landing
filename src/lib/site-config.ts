@@ -5,5 +5,5 @@ export const SITE = {
   phoneTel: "15880000",
   hours: "평일 오전 9시부터 오후 7시까지",
   /** Public origin, used to make the share image URL absolute. No trailing slash. */
-  url: "https://ssakdeal.workers.dev",
+  url: "https://rkdid500.github.io/ssakdeal-landing",
 } as const;
