@@ -1,4 +1,4 @@
-# 딱맞춤 랜딩페이지
+# 싹딜 랜딩페이지
 
 인터넷, 휴대폰 상담 신청용 모바일 우선 랜딩페이지입니다.
 React 19 + TanStack Start로 만들고 Cloudflare Workers에 배포하며, 상담 신청은 Cloudflare D1 데이터베이스에 저장됩니다.
@@ -22,7 +22,7 @@ React 19 + TanStack Start로 만들고 Cloudflare Workers에 배포하며, 상�
 ```bash
 npm install
 npx wrangler login                     # 브라우저에서 Cloudflare 로그인
-npx wrangler d1 create ddakmatchum-db  # 출력된 database_id를 wrangler.jsonc에 붙여넣기
+npx wrangler d1 create ssakdeal-db  # 출력된 database_id를 wrangler.jsonc에 붙여넣기
 npm run db:migrate                     # 원격 DB에 테이블 생성
 npx wrangler secret put ADMIN_KEY      # /admin 접속용 비밀번호 입력
 ```

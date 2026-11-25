@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 
-import { LogoMark } from "@/components/brand/logo";
+import { BrandLogo } from "@/components/brand/logo";
 import { listLeads, type LeadRow } from "@/lib/api/leads.functions";
 
 export const Route = createFileRoute("/admin")({
@@ -53,8 +53,7 @@ function AdminPage() {
     <main className="admin">
       <div className="admin__inner">
         <a className="site-header__brand" href="/">
-          <LogoMark />
-          <span className="site-header__word">딱맞춤</span>
+          <BrandLogo height={30} />
         </a>
         <h1 className="admin__title">상담 신청 관리</h1>
         <form className="admin__form" onSubmit={load}>

@@ -1,5 +1,5 @@
 {
-  "name": "ddakmatchum-landing",
+  "name": "ssakdeal-landing",
   "private": true,
   "type": "module",
   "scripts": {
@@ -7,8 +7,8 @@
     "build": "tsr generate && tsc --noEmit && vite build",
     "typecheck": "tsr generate && tsc --noEmit",
     "deploy": "npm run build && wrangler deploy",
-    "db:migrate": "wrangler d1 migrations apply ddakmatchum-db --remote",
-    "db:migrate:local": "wrangler d1 migrations apply ddakmatchum-db --local"
+    "db:migrate": "wrangler d1 migrations apply ssakdeal-db --remote",
+    "db:migrate:local": "wrangler d1 migrations apply ssakdeal-db --local"
   },
   "dependencies": {
     "@tailwindcss/vite": "4.3.2",

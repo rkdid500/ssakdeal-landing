@@ -1,4 +1,4 @@
-import { LogoMark } from "@/components/brand/logo";
+import { BrandLogo } from "@/components/brand/logo";
 import { SITE } from "@/lib/site-config";
 
 import { LeadForm } from "./lead-form";
@@ -37,20 +37,19 @@ export function Hero() {
       <p className="hero__strip">합리적인 요금, 끝까지 챙기는 혜택</p>
       <div className="hero__head">
         <a aria-label={`${SITE.name} 처음으로`} className="brand" href="/">
-          <LogoMark size={26} />
-          <span>{SITE.name}</span>
+          <BrandLogo height={30} />
         </a>
-        <Art className="hero__mascot float" eager size={84} src={ART.mascot} />
+        <Art className="hero__mascot float" eager size={92} src={ART.ssakWave} />
       </div>
       <p className="hero__kicker">인터넷과 휴대폰을 한 번에</p>
       <h1 className="hero__title">
-        <span className="hero__line">딱 맞게 바꾸고</span>
-        <span className="hero__line hero__line--gold">최대 혜택으로</span>
+        <span className="hero__line">요금은 싹 줄이고</span>
+        <span className="hero__line hero__line--gold">혜택은 최대로</span>
       </h1>
       <p className="hero__sub">
         정확한 요금 설계부터 보이지 않던 혜택까지
         <br />
-        딱맞춤이 한 번에, 끝까지 챙겨드려요.
+        싹딜이 한 번에, 끝까지 챙겨드려요.
       </p>
       <ul className="hero__cards">
         {HERO_CARDS.map((c) => (
@@ -77,11 +76,11 @@ export function Trust() {
       <h2 className="sec__title">
         숫자로 증명된 선택
         <br />
-        <span className="txt-gold">딱맞춤</span>
+        <span className="txt-gold">싹딜</span>
       </h2>
       <div className="trust__badge">
         <span aria-hidden="true" className="trust__laurel trust__laurel--l" />
-        <Art className="trust__mascot float" size={150} src={ART.mascot} />
+        <Art className="trust__mascot float" size={170} src={ART.ssakHappy} />
         <span aria-hidden="true" className="trust__laurel trust__laurel--r" />
       </div>
       <div className="stat-stack">
@@ -117,12 +116,12 @@ export function Compare() {
       <Num n="01" />
       <h2 className="sec__title" id="compare-title">혜택 비교</h2>
       <table className="cmp">
-        <caption className="sr-only">타업체와 딱맞춤 혜택 금액 비교 (예시)</caption>
+        <caption className="sr-only">타업체와 싹딜 혜택 금액 비교 (예시)</caption>
         <thead>
           <tr>
             <th className="cmp__h cmp__h--other" scope="col">타업체</th>
             <td className="cmp__h cmp__h--mid" />
-            <th className="cmp__h cmp__h--ours" scope="col">딱맞춤</th>
+            <th className="cmp__h cmp__h--ours" scope="col">싹딜</th>
           </tr>
         </thead>
         <tbody>
@@ -155,7 +154,7 @@ export function Customers() {
     <section aria-labelledby="cust-title" className="sec sec--dark customers">
       <Num n="02" />
       <h2 className="sec__title" id="cust-title">누적 상담 고객</h2>
-      <div aria-label="타업체 8,000명, 딱맞춤 33,000명 (예시)" className="bars" role="img">
+      <div aria-label="타업체 8,000명, 싹딜 33,000명 (예시)" className="bars" role="img">
         <div className="bars__col">
           <div className="bars__bar bars__bar--other">
             <span>8,000명</span>
@@ -169,7 +168,7 @@ export function Customers() {
           <div className="bars__bar bars__bar--ours">
             <span>33,000명+</span>
           </div>
-          <span className="bars__name">딱맞춤</span>
+          <span className="bars__name">싹딜</span>
         </div>
       </div>
     </section>
@@ -180,11 +179,11 @@ export function Customers() {
 export function Consult() {
   return (
     <section aria-labelledby="consult-title" className="sec sec--light consult" id="consult">
-      <Art className="consult__mascot float" size={96} src={ART.mascot} />
+      <Art className="consult__mascot float" size={120} src={ART.ssakCheck} />
       <h2 className="sec__title sec__title--ink" id="consult-title">
         놓치고 있던 <span className="txt-blue">혜택</span>까지
         <br />
-        딱맞춤이 찾아드려요!
+        싹딜이 찾아드려요!
       </h2>
       <LeadForm />
     </section>
@@ -217,7 +216,7 @@ export function Worry() {
         <br />
         조건은 비슷해 보여도 결과는 달라요.
         <br />
-        <strong>딱맞춤이 확실한 기준으로 답을 드릴게요.</strong>
+        <strong>싹딜이 확실한 기준으로 답을 드릴게요.</strong>
       </p>
     </section>
   );
@@ -238,7 +237,7 @@ const REASONS = [
     n: "02",
     title: "맞춤형 추천 시스템",
     body: "고객님의 시간을 낭비하지 않도록 꼭 맞는 상품만 정확하게 안내해요.",
-    art: ART.magnifier,
+    art: ART.ssakLook,
     tone: "sky",
   },
   {
@@ -263,7 +262,7 @@ export function Reasons() {
   return (
     <section aria-labelledby="why-title" className="sec sec--mist reasons">
       <h2 className="sec__title sec__title--ink" id="why-title">
-        딱맞춤을 선택하는 이유
+        싹딜을 선택하는 이유
       </h2>
       <ul className="reasons__list">
         {REASONS.map((r) => (
@@ -299,7 +298,7 @@ export function Moments() {
       </div>
       <p className="moments__lead">가장 먼저 떠오르는 곳.</p>
       <h2 className="sec__title" id="moments-title">
-        그것이 딱맞춤이
+        그것이 싹딜이
         <br />
         지키는 <span className="txt-gold">기준</span>입니다.
       </h2>
@@ -319,7 +318,7 @@ export function Steps() {
   return (
     <section aria-labelledby="steps-title" className="sec sec--light steps">
       <h2 className="sec__title sec__title--ink" id="steps-title">
-        딱맞춤만의
+        싹딜만의
         <br />
         초간단 가입 절차
       </h2>
@@ -361,7 +360,7 @@ export function Reviews() {
         <h2 className="sec__title sec__title--ink" id="reviews-title">
           숫자가 증명하는
           <br />
-          딱맞춤의 기준
+          싹딜의 기준
         </h2>
         <p className="sec__lead sec__lead--ink">지금 이 순간에도 후기는 계속 쌓이고 있어요.</p>
         <ul className="reviews__list">
@@ -389,10 +388,11 @@ export function FinalCta() {
   return (
     <section aria-labelledby="final-title" className="sec sec--dark final">
       <div className="final__card">
+        <Art className="final__mascot float" size={110} src={ART.ssakSearch} />
         <h2 className="sec__title" id="final-title">
           사은품의 기준은
           <br />
-          딱맞춤에서
+          싹딜에서
         </h2>
         <a className="final__phone" href={`tel:${SITE.phoneTel}`}>
           <svg aria-hidden="true" viewBox="0 0 24 24">
@@ -403,7 +403,7 @@ export function FinalCta() {
         <p className="final__text">
           어디서 가입할지 고민된다면 혜택부터 비교해 보세요.
           <br />
-          최대 혜택의 정점은 딱맞춤이에요.
+          최대 혜택의 정점은 싹딜이에요.
         </p>
       </div>
     </section>
@@ -414,10 +414,9 @@ export function Footer() {
   return (
     <footer className="foot">
       <div className="foot__brand">
-        <LogoMark size={30} />
-        <span>{SITE.name}</span>
+        <BrandLogo height={30} />
       </div>
-      <p>회사명: 딱맞춤 (오픈 전 입력) | 대표자: 오픈 전 입력</p>
+      <p>회사명: 싹딜 (오픈 전 입력) | 대표자: 오픈 전 입력</p>
       <p>사업자번호: 오픈 전 입력 | 주소: 오픈 전 입력</p>
       <p>
         대표번호 {SITE.phone} | {SITE.hours}

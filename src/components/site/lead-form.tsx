@@ -243,7 +243,7 @@ export function LeadForm() {
       ) : null}
 
       <button aria-busy={submitting} className="lf-submit" disabled={submitting} type="submit">
-        {submitting ? "보내는 중" : "딱맞춤 혜택 상담 신청하기"}
+        {submitting ? "보내는 중" : "싹딜 혜택 상담 신청하기"}
         {submitting ? null : <span aria-hidden="true" className="lf-submit__chev" />}
       </button>
     </form>

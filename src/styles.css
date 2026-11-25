@@ -2,7 +2,7 @@
 @source "../src";
 
 /* =====================================================================
- * 딱맞춤 site layer: mobile-first single column (max 480px).
+ * 싹딜 site layer: mobile-first single column (max 480px).
  * Unlayered on purpose so it wins over the template's layered base styles.
  * ===================================================================== */
 :root {
@@ -240,9 +240,12 @@ body.site-body a {
   border-radius: 6px;
 }
 .hero__mascot {
-  width: 84px;
-  height: 84px;
-  margin-right: -6px;
+  width: 92px;
+  height: 92px;
+  margin-right: -8px;
+}
+.brand-logo {
+  display: block;
 }
 .hero__kicker {
   margin: 10px 0 0;
@@ -362,8 +365,8 @@ body.site-body .btn-glow {
   margin: 24px auto 0;
 }
 .trust__mascot {
-  width: 150px;
-  height: 150px;
+  width: 170px;
+  height: 170px;
   filter: drop-shadow(0 16px 30px rgba(47, 91, 255, 0.45));
 }
 .trust__laurel {
@@ -594,8 +597,8 @@ body.site-body .btn-glow {
   padding-top: 56px;
 }
 .consult__mascot {
-  width: 96px;
-  height: 96px;
+  width: 120px;
+  height: 120px;
   margin: 0 auto;
 }
 .lf {
@@ -1178,6 +1181,15 @@ body.site-body .btn-glow {
   border-radius: 26px;
   box-shadow: 0 20px 40px rgba(5, 10, 40, 0.45);
 }
+.final__mascot {
+  width: 110px;
+  height: 110px;
+  margin: -70px auto 6px;
+  filter: drop-shadow(0 12px 20px rgba(5, 10, 40, 0.45));
+}
+.final {
+  padding-top: 96px;
+}
 .final__phone {
   display: inline-flex;
   align-items: center;
@@ -1189,7 +1201,16 @@ body.site-body .btn-glow {
   line-height: 1;
   text-decoration: none;
 }
-body.site-body .final__phone {
+body.site-body .final__mascot {
+  width: 110px;
+  height: 110px;
+  margin: -70px auto 6px;
+  filter: drop-shadow(0 12px 20px rgba(5, 10, 40, 0.45));
+}
+.final {
+  padding-top: 96px;
+}
+.final__phone {
   color: var(--sun);
 }
 .final__phone svg {

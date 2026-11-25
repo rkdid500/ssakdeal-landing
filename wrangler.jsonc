@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "ddakmatchum",
+  "name": "ssakdeal",
   // TanStack Start emits the SSR Worker here (`npm run build`).
   "main": "dist/server/server.js",
   "compatibility_date": "2025-05-01",
@@ -12,12 +12,12 @@
     "binding": "ASSETS",
     "not_found_handling": "none"
   },
-  // Consultation requests. Create once with `npx wrangler d1 create ddakmatchum-db`
+  // Consultation requests. Create once with `npx wrangler d1 create ssakdeal-db`
   // and paste the printed database_id here.
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "ddakmatchum-db",
+      "database_name": "ssakdeal-db",
       "database_id": "00000000-0000-0000-0000-000000000000",
       "migrations_dir": "migrations"
     }

@@ -9,7 +9,11 @@ export const ART = {
   calendar: "/assets/3d/calendar.webp",
   clipboard: "/assets/3d/clipboard.webp",
   trophy: "/assets/3d/trophy.webp",
-  mascot: "/assets/3d/mascot.webp",
+  ssakSearch: "/assets/brand/ssak-00.webp",
+  ssakCheck: "/assets/brand/ssak-01.webp",
+  ssakWave: "/assets/brand/ssak-02.webp",
+  ssakHappy: "/assets/brand/ssak-03.webp",
+  ssakLook: "/assets/brand/ssak-04.webp",
   coins: "/assets/3d/coins.webp",
   chat: "/assets/3d/chat.webp",
 } as const;

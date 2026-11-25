@@ -1,4 +1,4 @@
-# 딱맞춤 design brief
+# 싹딜 design brief (v1 concept, superseded by the v2 mobile layout)
 
 - Design read: 인터넷, 휴대폰, 정수기 요금이 아까운 30~50대 가구. 믿을 수 있는 계산원 같은 차분한 확신, 그러나 할인 전단의 즐거움은 유지.
 - Concept spine: "가격표". 노란 가격표가 브랜드 마크이자 핵심 CTA 형태이고, 페이지는 진열대를 따라 걷듯 세 상품을 차례로 지나 상담대에 도착한다.
