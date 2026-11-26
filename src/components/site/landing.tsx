@@ -31,10 +31,25 @@ const HERO_CARDS = [
   { label: "합산 최대", amount: "102만원", art: ART.gift, tilt: "l", gold: true },
 ];
 
+const TICKER = ["합리적인 요금, 끝까지 챙기는 혜택", "인터넷 최대 50만원", "휴대폰 최대 52만원", "차액 130% 보상", "누적 상담 3만명+"];
+
 export function Hero() {
   return (
     <section className="hero" id="top">
-      <p className="hero__strip">합리적인 요금, 끝까지 챙기는 혜택</p>
+      <div className="hero__strip ticker">
+        <p className="sr-only">합리적인 요금, 끝까지 챙기는 혜택</p>
+        <div aria-hidden="true" className="ticker__track">
+          {[0, 1].map((k) => (
+            <span className="ticker__set" key={k}>
+              {TICKER.map((t) => (
+                <span className="ticker__item" key={t}>
+                  {t}
+                </span>
+              ))}
+            </span>
+          ))}
+        </div>
+      </div>
       <div className="hero__head">
         <a aria-label={`${SITE.name} 처음으로`} className="brand" href={import.meta.env.BASE_URL}>
           <BrandLogo height={30} />
@@ -363,9 +378,11 @@ export function Reviews() {
           싹딜의 기준
         </h2>
         <p className="sec__lead sec__lead--ink">지금 이 순간에도 후기는 계속 쌓이고 있어요.</p>
-        <ul className="reviews__list">
-          {REVIEWS.map((r) => (
-            <li className="review" key={r.who}>
+      </div>
+      <div className="marquee">
+        <ul className="reviews__list marquee__track">
+          {[...REVIEWS, ...REVIEWS].map((r, i) => (
+            <li aria-hidden={i >= REVIEWS.length ? true : undefined} className="review" key={`${r.who}-${i}`}>
               <Art className="review__icon" size={56} src={ART.chat} />
               <div>
                 <p className="review__stars" aria-label="별점 5점">★★★★★</p>
@@ -377,6 +394,8 @@ export function Reviews() {
             </li>
           ))}
         </ul>
+      </div>
+      <div className="reviews__foot">
         <p className="reviews__sample">시안용 예시 후기입니다.</p>
       </div>
     </section>

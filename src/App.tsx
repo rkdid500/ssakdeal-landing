@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+
 import {
   Compare,
   Consult,
@@ -14,8 +16,11 @@ import {
 } from "@/components/site/landing";
 import { QuickBar } from "@/components/site/quick-bar";
 import { ToTop } from "@/components/site/to-top";
+import { initMotion } from "@/lib/motion";
 
 export function App() {
+  useEffect(() => initMotion(), []);
+
   return (
     <div className="stage">
       <main className="page">

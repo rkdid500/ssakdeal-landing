@@ -1580,3 +1580,148 @@ body.site-body .final__mascot {
   border-radius: 12px;
   cursor: pointer;
 }
+
+/* =====================================================================
+ * Motion layer (scroll + entrance). GSAP drives most of it from
+ * src/lib/motion.ts; the loops below are pure CSS. All off under
+ * prefers-reduced-motion.
+ * ===================================================================== */
+
+/* hero ticker */
+.ticker {
+  overflow: hidden;
+  white-space: nowrap;
+}
+.ticker__track {
+  display: inline-flex;
+  width: max-content;
+}
+.ticker__set {
+  display: inline-flex;
+}
+.ticker__item {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 18px;
+}
+.ticker__item::after {
+  content: "";
+  width: 5px;
+  height: 5px;
+  margin-left: 36px;
+  border-radius: 50%;
+  background: var(--sun);
+}
+
+/* reviews marquee */
+.reviews__body {
+  padding-bottom: 0;
+}
+.marquee {
+  overflow: hidden;
+  padding: 24px 0 4px;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.marquee .reviews__list {
+  display: flex;
+  gap: 12px;
+  width: max-content;
+  margin: 0;
+  padding: 0 var(--pad);
+}
+.marquee .review {
+  width: 286px;
+  flex: none;
+}
+.reviews__foot {
+  padding: 0 var(--pad) 64px;
+}
+
+/* compare: our column lights up once the rows have landed */
+.cmp .cmp__ours {
+  transition: text-shadow 0.6s ease, color 0.6s ease;
+}
+.cmp.is-lit .cmp__ours {
+  text-shadow: 0 0 18px rgba(255, 200, 61, 0.65);
+}
+
+/* worry bubbles: pop in, then drift */
+.worry__cloud .bubble {
+  scale: 0;
+}
+.worry__cloud.is-in .bubble {
+  animation:
+    pop 0.6s cubic-bezier(0.34, 1.7, 0.6, 1) forwards,
+    drift 5s ease-in-out 0.6s infinite;
+}
+.worry__cloud.is-in .bubble--b { animation-delay: 0.12s, 0.9s; }
+.worry__cloud.is-in .bubble--c { animation-delay: 0.24s, 1.4s; }
+.worry__cloud.is-in .bubble--d { animation-delay: 0.36s, 2s; }
+@keyframes pop { to { scale: 1; } }
+@keyframes drift { 50% { translate: 0 -8px; } }
+
+/* reasons: cards stack while scrolling */
+.reasons__list .rcard {
+  position: sticky;
+  top: 20px;
+  transform-origin: 50% 0;
+}
+.reasons__list .rcard:nth-child(2) { top: 34px; }
+.reasons__list .rcard:nth-child(3) { top: 48px; }
+.reasons__list .rcard:nth-child(4) { top: 62px; }
+
+/* light sweep on the main buttons */
+.btn-glow,
+.final__phone {
+  position: relative;
+  overflow: hidden;
+}
+.btn-glow::after,
+.final__phone::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 -60%;
+  width: 40%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* word-by-word reveal needs inline words */
+.w {
+  display: inline;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ticker__track {
+    animation: ticker 28s linear infinite;
+  }
+  .marquee .reviews__list {
+    animation: ticker 34s linear infinite;
+  }
+  .marquee:hover .reviews__list,
+  .marquee:active .reviews__list {
+    animation-play-state: paused;
+  }
+  .btn-glow::after,
+  .final__phone::after {
+    opacity: 1;
+    animation: sweep 3.2s ease-in-out infinite;
+  }
+  .pcard {
+    animation: bob 5s ease-in-out infinite;
+  }
+  .pcard:nth-child(2) { animation-delay: -1.2s; }
+  .pcard:nth-child(3) { animation-delay: -2.4s; }
+  .pcard:nth-child(4) { animation-delay: -3.6s; }
+}
+@keyframes ticker { to { transform: translateX(-50%); } }
+@keyframes sweep { 0%, 55% { left: -60%; } 100% { left: 130%; } }
+@keyframes bob { 50% { translate: 0 -6px; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .worry__cloud .bubble { scale: 1; }
+  .reasons__list .rcard { position: static; }
+  .marquee { overflow-x: auto; }
+}
