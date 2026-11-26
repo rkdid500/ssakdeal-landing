@@ -1,8 +1,9 @@
 /**
- * 싹딜 인터넷 가입 랜딩 - 최종 믹스 버전
+ * 싹딜 인터넷 가입 랜딩 - 최종 버전 (반응형)
  *
  * - 정보 흐름: 시안 1 (히어로 → 금액 구성 → 비교 → 가구별 견적 → 사은품 → 후기 → 3단계 → FAQ → 상담 신청)
- * - 디자인:    시안 2 (네이비·블루·골드 팔레트, Black Han Sans + IBM Plex Sans KR, 글래스 카드, 3D 아트)
+ * - 디자인:    딥 네이비 + 싹딜 민트, Pretendard (sakd.co.kr 서체), 얇은 라인과 넉넉한 여백
+ * - 반응형:    모바일 우선, 768px(태블릿)·1024px(데스크톱)에서 레이아웃 전환
  * - 외부 라이브러리 없음: React 내장 Hook + 순수 CSS(sakd-landing.css)만 사용
  *
  * 사용법
@@ -48,45 +49,48 @@ const NAV = [
   { id: "faq", label: "자주 묻는 질문" },
 ];
 
-const TICKER = [
-  "설치 당일 현금 지급",
-  "차액 200% 보상",
-  "인터넷 최대 138만원",
-  "사은품 직접 선택",
-  "상담만 받아도 괜찮아요",
-];
+const TICKER = ["설치 완료 후 1시간 내 입금", "차액 200% 보상", "인터넷 최대 138만원", "사은품 직접 선택", "상담만 받아도 괜찮아요"];
 
 const HERO_MAX = 138; // 만원
 
+const TRUST = [
+  { icon: "bolt", label: "설치 후 1시간 내 입금" },
+  { icon: "shield", label: "차액 200% 보상" },
+  { icon: "users", label: "누적 상담 3만명+" },
+] as const;
+
 /* 금액 구성 (예시 수치 - 실제 운영 기준으로 교체) */
 const BREAKDOWN = [
-  { label: "현금 지원금", sub: "설치 당일 입금", amount: 68, unit: "만원", tone: "gold" },
+  { label: "현금 지원금", sub: "설치 완료 후 입금", amount: 68, unit: "만원", tone: "mint" },
   { label: "사은품", sub: "가전 1개 선택", amount: 40, unit: "만원 상당", tone: "blue" },
   { label: "휴대폰 결합 할인", sub: "3년 합계", amount: 30, unit: "만원", tone: "sky" },
 ] as const;
 
-/* 타사 비교 (타사 수치는 자사 조사 기준) - accent: 금색 강조, secret: 강조 배경 */
-const COMPARE = [
-  { icon: "🌐", key: "인터넷+TV", other: "35만원", ours: "최대 47만원", sub: "통신사별 상이" },
-  { icon: "📱", key: "휴대폰 개통", other: "40만원", ours: "50만원", sub: "USIM 개통 기준" },
-  { icon: "🔒", key: "비밀지원금", other: "20만원", ours: "상담 시 공개", sub: "추가 지원금 별도 안내", accent: true, secret: true },
-  { icon: "⚡", key: "지급 시점", other: "오후 마감 전\n설치 시 당일", otherSmall: true, ours: "1시간 내 입금", sub: "설치 완료 후 당일", accent: true },
-  { icon: "🛡️", key: "차액 보상", other: "120~130%", ours: "200% 보상", sub: "차액의 2배", accent: true },
-  { icon: "💰", key: "총 지원금액", other: "95만원", ours: `최대 ${HERO_MAX}만원`, sub: "" },
+/* 타사 비교 (타사 수치는 자사 조사 기준) */
+type IconName = "wifi" | "phone" | "lock" | "bolt" | "shield" | "wallet" | "users" | "check" | "chat" | "call" | "gift";
+const COMPARE: {
+  icon: IconName;
+  key: string;
+  other: string;
+  ours: string;
+  sub?: string;
+  accent?: boolean;
+  secret?: boolean;
+  otherSmall?: boolean;
+}[] = [
+  { icon: "wifi", key: "인터넷+TV", other: "35만원", ours: "최대 47만원", sub: "통신사별 상이" },
+  { icon: "phone", key: "휴대폰 개통", other: "40만원", ours: "50만원", sub: "USIM 개통 기준" },
+  { icon: "lock", key: "비밀지원금", other: "20만원", ours: "상담 시 공개", sub: "추가 지원금 별도 안내", accent: true, secret: true },
+  { icon: "bolt", key: "지급 시점", other: "오후 마감 전\n설치 시 당일", otherSmall: true, ours: "1시간 내 입금", sub: "설치 완료 후 당일", accent: true },
+  { icon: "shield", key: "차액 보상", other: "120~130%", ours: "200% 보상", sub: "차액의 2배", accent: true },
+  { icon: "wallet", key: "총 지원금액", other: "95만원", ours: `${HERO_MAX}만원` },
 ];
 const COMPARE_NOTES = [
   "인터넷+TV 사은품은 통신사·상품별로 다릅니다 (SK 40만원 / KT 45만원 / LG U+ 47만원)",
   "타사업체 수치는 자사 조사 기준이며, 지급 조건 및 차액 보상 세부 기준은 상담 시 안내드립니다",
 ];
 
-type Plan = {
-  tab: string;
-  product: string;
-  speed: string;
-  cash: number;
-  fee: number;
-  note: string;
-};
+type Plan = { tab: string; product: string; speed: string; cash: number; fee: number; note: string };
 const PLANS: Plan[] = [
   {
     tab: "1인 가구",
@@ -127,53 +131,25 @@ const GIFTS_MORE = [
   { cat: "상품권", name: "신세계 상품권" },
 ];
 
+const STATS = [
+  { label: "누적 상담 고객", value: 33000, suffix: "명+" },
+  { label: "제휴 판매점", value: 40, suffix: "곳+" },
+  { label: "상담 후기", value: 20000, suffix: "건+" },
+];
+
 const REVIEWS = [
-  {
-    tag: "재약정 대신 신규",
-    who: "문*환",
-    text: "처음에는 그냥 재약정하려다가 이것저것 비교해 보고 신규로 바꿨어요. 설치까지 생각보다 간단해서 만족해요!",
-  },
-  {
-    tag: "설명이 깔끔",
-    who: "심*혁",
-    text: "인터넷 가입 알아보면서 여기저기 문의했는데 설명이 깔끔해서 좋았습니다. 사은품도 빵빵합니다.",
-  },
-  {
-    tag: "맞춤 추천",
-    who: "박*하",
-    text: "500메가랑 1기가 중에 고민했는데 사용 패턴에 맞춰서 알려주시더라고요. 괜히 비싼 걸로 안 해도 돼서 좋았어요.",
-  },
-  {
-    tag: "빠른 설치",
-    who: "문*희",
-    text: "약정 끝나서 새로 가입했어요. 상담도 빠르고 설치 일정도 바로 잡혀서 생각보다 금방 끝났네요.",
-  },
-  {
-    tag: "조건 비교",
-    who: "하*석",
-    text: "인터넷 어디서 해야 하나 한참 찾아봤는데 조건 비교해서 설명해 주셔서 결정하기 편했어요.",
-  },
-  {
-    tag: "가족 결합",
-    who: "홍*기",
-    text: "가족 결합 때문에 어떤 게 나은지 헷갈렸는데 비교해서 알려주셔서 도움 됐어요.",
-  },
+  { tag: "재약정 대신 신규", who: "문*환", text: "처음에는 그냥 재약정하려다가 이것저것 비교해 보고 신규로 바꿨어요. 설치까지 생각보다 간단해서 만족해요!" },
+  { tag: "설명이 깔끔", who: "심*혁", text: "인터넷 가입 알아보면서 여기저기 문의했는데 설명이 깔끔해서 좋았습니다. 사은품도 빵빵합니다." },
+  { tag: "맞춤 추천", who: "박*하", text: "500메가랑 1기가 중에 고민했는데 사용 패턴에 맞춰서 알려주시더라고요. 괜히 비싼 걸로 안 해도 돼서 좋았어요." },
+  { tag: "빠른 설치", who: "문*희", text: "약정 끝나서 새로 가입했어요. 상담도 빠르고 설치 일정도 바로 잡혀서 생각보다 금방 끝났네요." },
+  { tag: "조건 비교", who: "하*석", text: "인터넷 어디서 해야 하나 한참 찾아봤는데 조건 비교해서 설명해 주셔서 결정하기 편했어요." },
+  { tag: "가족 결합", who: "홍*기", text: "가족 결합 때문에 어떤 게 나은지 헷갈렸는데 비교해서 알려주셔서 도움 됐어요." },
 ];
 
 const STEPS = [
-  {
-    n: "01",
-    title: "상담",
-    body: "현금·사은품 금액을 가입 전에 확정해요",
-    art: "3d/clipboard.webp",
-  },
+  { n: "01", title: "상담", body: "현금·사은품 금액을 가입 전에 확정해요", art: "3d/clipboard.webp" },
   { n: "02", title: "설치", body: "원하는 날짜에 기사님이 방문해요", art: "3d/calendar.webp" },
-  {
-    n: "03",
-    title: "당일 지급",
-    body: "설치 당일 고객님 계좌로 입금해요",
-    art: "3d/moneybag.webp",
-  },
+  { n: "03", title: "입금", body: "설치 완료 후 1시간 내 계좌로 입금해요", art: "3d/moneybag.webp" },
 ];
 
 const FAQS = [
@@ -181,28 +157,19 @@ const FAQS = [
     q: `최대 ${HERO_MAX}만원은 누구나 받나요?`,
     a: "인터넷 + TV + 휴대폰 결합 기준 최대 금액이에요. 인터넷만 가입하셔도 현금 지원금은 받으실 수 있고, 내 조건의 정확한 금액은 상담에서 가입 전에 먼저 안내해 드려요.",
   },
-  {
-    q: "지원금은 정말 설치 당일 들어오나요?",
-    a: "네. 설치가 완료된 당일 고객님 계좌로 입금해 드려요.",
-  },
+  { q: "지원금은 언제 들어오나요?", a: "설치가 완료되면 당일, 1시간 내에 고객님 계좌로 입금해 드려요." },
   {
     q: "차액 200% 보상은 어떻게 받나요?",
     a: "동일 날짜·동일 통신사·동일 요금제 기준으로 다른 업체가 더 높은 혜택을 제공하면, 그 차액의 200%를 추가로 보상해 드려요.",
   },
-  {
-    q: "통신사나 속도는 제가 골라야 하나요?",
-    a: "아니요. 사용 패턴과 가구원 수를 듣고 상담사가 맞는 조건을 추천해 드려요.",
-  },
-  {
-    q: "상담만 받고 가입 안 해도 되나요?",
-    a: "물론이에요. 다른 곳과 충분히 비교해 보시고 결정하셔도 괜찮아요.",
-  },
+  { q: "통신사나 속도는 제가 골라야 하나요?", a: "아니요. 사용 패턴과 가구원 수를 듣고 상담사가 맞는 조건을 추천해 드려요." },
+  { q: "상담만 받고 가입 안 해도 되나요?", a: "물론이에요. 다른 곳과 충분히 비교해 보시고 결정하셔도 괜찮아요." },
 ];
 
-const PRODUCTS = [
-  { value: "인터넷", art: "3d/router.webp" },
-  { value: "인터넷 + TV", art: "gifts/gift-tv.webp" },
-  { value: "휴대폰 결합", art: "3d/phone.webp" },
+const PRODUCTS: { value: string; icon: IconName }[] = [
+  { value: "인터넷", icon: "wifi" },
+  { value: "인터넷 + TV", icon: "gift" },
+  { value: "휴대폰 결합", icon: "phone" },
 ];
 
 export type Lead = { product: string; name: string; phone: string; plan: string; from: string };
@@ -218,9 +185,7 @@ async function submitLead(lead: Lead): Promise<void> {
  * Hooks (React 내장 Hook만 사용)
  * ===================================================================== */
 function prefersReducedMotion() {
-  return (
-    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
-  );
+  return typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 /** 요소가 화면에 들어오면 true. once=true면 한 번 들어온 뒤로 계속 true */
@@ -249,6 +214,19 @@ function useInView<T extends Element>({ threshold = 0.2, once = true, rootMargin
     return () => io.disconnect();
   }, [threshold, once, rootMargin]);
   return [ref, inView] as const;
+}
+
+/** 미디어 쿼리 일치 여부 (반응형 슬라이더 등에 사용) */
+function useMedia(query: string) {
+  const [match, setMatch] = useState(() => typeof window !== "undefined" && window.matchMedia(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const on = () => setMatch(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, [query]);
+  return match;
 }
 
 /** 0(또는 이전 값)에서 target까지 숫자를 올리는 카운트업 */
@@ -317,21 +295,87 @@ function useEscape(active: boolean, onEscape: () => void) {
 }
 
 /* =====================================================================
+ * 아이콘 (인라인 SVG, 1.75px 라인)
+ * ===================================================================== */
+const ICON_PATHS: Record<IconName, ReactNode> = {
+  wifi: (
+    <>
+      <path d="M2.5 8.8a14 14 0 0 1 19 0" />
+      <path d="M5.8 12.3a9.2 9.2 0 0 1 12.4 0" />
+      <path d="M9.1 15.8a4.5 4.5 0 0 1 5.8 0" />
+      <circle cx="12" cy="19" r="1.1" fill="currentColor" stroke="none" />
+    </>
+  ),
+  phone: (
+    <>
+      <rect height="19" rx="3" width="12" x="6" y="2.5" />
+      <path d="M10.5 18.5h3" />
+    </>
+  ),
+  lock: (
+    <>
+      <rect height="10.5" rx="2.5" width="15" x="4.5" y="10.5" />
+      <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
+      <path d="M12 14.5v2.5" />
+    </>
+  ),
+  bolt: <path d="M13 2.5 4.5 13.5H11l-1 8 8.5-11H12l1-8z" />,
+  shield: (
+    <>
+      <path d="M12 2.8 4.5 5.6v5.6c0 4.7 3.2 8.6 7.5 10 4.3-1.4 7.5-5.3 7.5-10V5.6z" />
+      <path d="m8.8 12 2.2 2.2 4.4-4.4" />
+    </>
+  ),
+  wallet: (
+    <>
+      <path d="M4 7.5h14.5a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5.5A2 2 0 0 1 3.5 18.5V6a2.5 2.5 0 0 1 2.5-2.5h10" />
+      <path d="M16 14h1.5" />
+    </>
+  ),
+  users: (
+    <>
+      <circle cx="9" cy="8" r="3.5" />
+      <path d="M2.8 20a6.2 6.2 0 0 1 12.4 0" />
+      <path d="M15.5 4.8a3.5 3.5 0 0 1 0 6.4M17.5 14.3A6.2 6.2 0 0 1 21.2 20" />
+    </>
+  ),
+  check: <path d="m5 12.5 4.5 4.5L19 7.5" />,
+  chat: <path d="M12 3.5c-5 0-9 3.2-9 7.2 0 2.5 1.6 4.7 4 6l-.8 3.6 4-2.5c.6.1 1.2.1 1.8.1 5 0 9-3.2 9-7.2S17 3.5 12 3.5z" />,
+  call: (
+    <path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.6a1 1 0 0 1-.25 1z" />
+  ),
+  gift: (
+    <>
+      <rect height="13" rx="1.5" width="17" x="3.5" y="8" />
+      <path d="M2.5 8h19M12 8v13M12 8S10.5 3.5 8 3.5 5.5 6.5 8 8M12 8s1.5-4.5 4-4.5 2.5 3 0 4.5" />
+    </>
+  ),
+};
+
+function Icon({ name, className = "" }: { name: IconName; className?: string }) {
+  const filled = name === "chat" || name === "call";
+  return (
+    <svg
+      aria-hidden="true"
+      className={`sk-icon ${className}`}
+      fill={filled ? "currentColor" : "none"}
+      stroke={filled ? "none" : "currentColor"}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={1.75}
+      viewBox="0 0 24 24"
+    >
+      {ICON_PATHS[name]}
+    </svg>
+  );
+}
+
+/* =====================================================================
  * 작은 공용 컴포넌트
  * ===================================================================== */
 type AssetFn = (path: string) => string;
 
-function Art({
-  src,
-  size,
-  className = "",
-  eager = false,
-}: {
-  src: string;
-  size: number;
-  className?: string;
-  eager?: boolean;
-}) {
+function Art({ src, size, className = "", eager = false }: { src: string; size: number; className?: string; eager?: boolean }) {
   return (
     <img
       alt=""
@@ -346,63 +390,52 @@ function Art({
   );
 }
 
-function Reveal({
-  children,
-  className = "",
-  delay = 0,
-  id,
-}: {
-  children: ReactNode;
-  className?: string;
-  delay?: number;
-  id?: string;
-}) {
+function Reveal({ children, className = "", delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
   const [ref, inView] = useInView<HTMLDivElement>({ threshold: 0.15 });
   return (
-    <div
-      className={`sk-reveal ${inView ? "is-in" : ""} ${className}`}
-      id={id}
-      ref={ref}
-      style={{ "--d": `${delay}ms` } as CSSProperties}
-    >
+    <div className={`sk-reveal ${inView ? "is-in" : ""} ${className}`} ref={ref} style={{ "--d": `${delay}ms` } as CSSProperties}>
       {children}
     </div>
   );
 }
 
-function CountUp({
-  to,
-  run,
-  format = true,
-  duration,
-}: {
-  to: number;
-  run: boolean;
-  format?: boolean;
-  duration?: number;
-}) {
+function CountUp({ to, run, duration }: { to: number; run: boolean; duration?: number }) {
   const v = useCountUp(to, run, duration);
-  const n = Math.round(v);
-  return <>{format ? n.toLocaleString("ko-KR") : n}</>;
+  return <>{Math.round(v).toLocaleString("ko-KR")}</>;
 }
 
-function NumBadge({ n }: { n: string }) {
-  return <span className="sk-num">{n}</span>;
+function SecHead({
+  kicker,
+  title,
+  lead,
+  align = "center",
+}: {
+  kicker: string;
+  title: ReactNode;
+  lead?: ReactNode;
+  align?: "center" | "left";
+}) {
+  return (
+    <Reveal className={`sk-head sk-head--${align}`}>
+      <p className="sk-kicker">{kicker}</p>
+      <h2 className="sk-h2">{title}</h2>
+      {lead ? <p className="sk-lead">{lead}</p> : null}
+    </Reveal>
+  );
 }
 
-function Chev() {
-  return <span aria-hidden="true" className="sk-chev" />;
+function Arrow() {
+  return (
+    <svg aria-hidden="true" className="sk-arrow" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} viewBox="0 0 24 24">
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  );
 }
 
 /** 높이 애니메이션이 있는 펼침 영역 (grid-template-rows 0fr → 1fr) */
 function Collapse({ open, id, children }: { open: boolean; id: string; children: ReactNode }) {
   return (
-    <div
-      aria-hidden={!open}
-      className={`sk-collapse ${open ? "is-open" : ""}`}
-      id={id}
-      inert={!open}
-    >
+    <div aria-hidden={!open} className={`sk-collapse ${open ? "is-open" : ""}`} id={id} inert={!open}>
       <div className="sk-collapse__inner">{children}</div>
     </div>
   );
@@ -415,7 +448,7 @@ function scrollToId(id: string) {
 }
 
 /* =====================================================================
- * 상단: 진행 바 + 티커 + 헤더(모바일 메뉴 토글)
+ * 상단: 진행 바 + 공지 티커 + 헤더(모바일 메뉴 토글 / 데스크톱 메뉴)
  * ===================================================================== */
 function ScrollProgress() {
   const bar = useRef<HTMLDivElement>(null);
@@ -446,7 +479,7 @@ function Ticker() {
     <div className="sk-ticker">
       <p className="sk-sr">{TICKER.join(", ")}</p>
       <div aria-hidden="true" className="sk-ticker__track">
-        {[0, 1].map((k) => (
+        {[0, 1, 2].map((k) => (
           <span className="sk-ticker__set" key={k}>
             {TICKER.map((t) => (
               <span className="sk-ticker__item" key={t}>
@@ -462,14 +495,19 @@ function Ticker() {
 
 function Header({ asset, onConsult }: { asset: AssetFn; onConsult: (from: string) => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const scrolled = useScrolledPast(40);
+  const scrolled = useScrolledPast(24);
+  const desktop = useMedia("(min-width: 1024px)");
   const close = useCallback(() => setMenuOpen(false), []);
-  useBodyLock(menuOpen);
+  useBodyLock(menuOpen && !desktop);
   useEscape(menuOpen, close);
+  useEffect(() => {
+    if (desktop) setMenuOpen(false);
+  }, [desktop]);
 
+  const solid = scrolled || menuOpen;
   return (
-    <header className={`sk-header ${scrolled ? "is-solid" : ""} ${menuOpen ? "is-menu" : ""}`}>
-      <div className="sk-header__bar">
+    <header className={`sk-header ${solid ? "is-solid" : ""} ${menuOpen ? "is-menu" : ""}`}>
+      <div className="sk-wrap sk-header__bar">
         <a
           aria-label={`${SITE.name} 처음으로`}
           className="sk-header__logo"
@@ -480,9 +518,30 @@ function Header({ asset, onConsult }: { asset: AssetFn; onConsult: (from: string
             window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
           }}
         >
-          <img alt={SITE.name} height={26} src={asset("brand/logo-white.webp")} width={52} />
+          <img alt={SITE.name} className="sk-logo sk-logo--white" height={28} src={asset("brand/logo-white.webp")} width={56} />
+          <img alt="" aria-hidden="true" className="sk-logo sk-logo--color" height={28} src={asset("brand/logo-color.webp")} width={56} />
         </a>
+
+        <nav aria-label="주요 메뉴" className="sk-gnb">
+          {NAV.map((item) => (
+            <a
+              href={`#${item.id}`}
+              key={item.id}
+              onClick={(e) => {
+                e.preventDefault();
+                scrollToId(item.id);
+              }}
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
+
         <div className="sk-header__right">
+          <a className="sk-header__tel" href={`tel:${SITE.phoneTel}`}>
+            <Icon name="call" />
+            {SITE.phone}
+          </a>
           <button className="sk-header__cta" onClick={() => onConsult("header")} type="button">
             상담 신청
           </button>
@@ -514,30 +573,25 @@ function Header({ asset, onConsult }: { asset: AssetFn; onConsult: (from: string
                   scrollToId(item.id);
                 }}
               >
-                <NumBadge n={String(i + 1).padStart(2, "0")} />
+                <span className="sk-menu__num">{String(i + 1).padStart(2, "0")}</span>
                 {item.label}
-                <Chev />
+                <Arrow />
               </a>
             </li>
           ))}
         </ul>
         <a className="sk-menu__call" href={`tel:${SITE.phoneTel}`}>
+          <Icon name="call" />
           전화 상담 <strong>{SITE.phone}</strong>
         </a>
       </nav>
-      <button
-        aria-hidden="true"
-        className="sk-menu__dim"
-        onClick={close}
-        tabIndex={-1}
-        type="button"
-      />
+      <button aria-hidden="true" className="sk-menu__dim" onClick={close} tabIndex={-1} type="button" />
     </header>
   );
 }
 
 /* =====================================================================
- * 1. 히어로 (마우스/터치 패럴랙스)
+ * 1. 히어로 (카운트업 + 마우스 패럴랙스)
  * ===================================================================== */
 function Hero({
   asset,
@@ -567,72 +621,81 @@ function Hero({
   };
 
   return (
-    <section
-      className={`sk-hero ${mounted ? "is-in" : ""}`}
-      id="hero"
-      onPointerLeave={onLeave}
-      onPointerMove={onMove}
-    >
-      <p className="sk-hero__chip">통신사 요금은 어디나 같아요. 다른 건 지원금뿐</p>
-      <h1 className="sk-hero__title">
-        <span className="sk-hero__line">인터넷 바꾸면</span>
-        <span className="sk-hero__amount">
-          <small>최대</small>
-          <strong>
-            <CountUp duration={1500} run={mounted} to={HERO_MAX} />
-          </strong>
-          <em>만원</em>
-        </span>
-      </h1>
-      <a
-        className="sk-hero__link"
-        href="#breakdown"
-        onClick={(e) => {
-          e.preventDefault();
-          scrollToId("breakdown");
-        }}
-      >
-        인터넷 + TV + 휴대폰 결합 기준 · 구성 보기
-      </a>
+    <section className={`sk-hero ${mounted ? "is-in" : ""}`} id="hero" onPointerLeave={onLeave} onPointerMove={onMove}>
+      <div aria-hidden="true" className="sk-hero__grid-bg" />
+      <div className="sk-wrap sk-hero__layout">
+        <div className="sk-hero__copy">
+          <p className="sk-hero__eyebrow">
+            <span className="sk-dot-live" />
+            인터넷 · TV · 휴대폰 결합 상담
+          </p>
+          <h1 className="sk-hero__title">
+            인터넷 바꾸고,
+            <br />
+            놓쳤던 지원금 <span className="sk-mint">싹</span> 받아가세요
+          </h1>
+          <div className="sk-hero__amount">
+            <span className="sk-hero__max">최대</span>
+            <strong>
+              <CountUp duration={1500} run={mounted} to={HERO_MAX} />
+            </strong>
+            <span className="sk-hero__unit">만원</span>
+          </div>
+          <a
+            className="sk-hero__link"
+            href="#breakdown"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToId("breakdown");
+            }}
+          >
+            인터넷 + TV + 휴대폰 결합 기준 · 구성 보기
+          </a>
+        </div>
 
-      <div aria-hidden="true" className="sk-hero__stage" ref={stage}>
-        <span className="sk-hero__halo" />
-        <Art className="sk-hero__router sk-layer" eager size={220} src={asset("3d/router.webp")} />
-        <Art
-          className="sk-hero__coins sk-layer sk-layer--far"
-          eager
-          size={110}
-          src={asset("3d/coins.webp")}
-        />
-        <Art
-          className="sk-hero__gift sk-layer sk-layer--near"
-          eager
-          size={96}
-          src={asset("3d/gift.webp")}
-        />
-        <Art
-          className="sk-hero__mascot sk-layer sk-layer--far"
-          eager
-          size={96}
-          src={asset("brand/ssak-02.webp")}
-        />
+        <div aria-hidden="true" className="sk-hero__visual" ref={stage}>
+          <span className="sk-hero__ring sk-hero__ring--1" />
+          <span className="sk-hero__ring sk-hero__ring--2" />
+          <span className="sk-hero__glow" />
+          <Art className="sk-hero__router sk-layer" eager size={320} src={asset("3d/router.webp")} />
+          <Art className="sk-hero__coins sk-layer sk-layer--far" eager size={120} src={asset("3d/coins.webp")} />
+          <div className="sk-hero__float sk-hero__float--a sk-layer sk-layer--near">
+            <Icon name="bolt" />
+            <span>
+              <small>지급 시점</small>
+              설치 후 1시간 내
+            </span>
+          </div>
+          <div className="sk-hero__float sk-hero__float--b sk-layer sk-layer--far">
+            <Icon name="shield" />
+            <span>
+              <small>차액 보상</small>
+              최대 200%
+            </span>
+          </div>
+        </div>
+
+        <div className="sk-hero__action">
+          <div className="sk-hero__btns">
+            <button className="sk-btn sk-btn--primary sk-btn--lg" onClick={() => onConsult("hero")} ref={ctaRef} type="button">
+              내 지원금 확인하기
+              <Arrow />
+            </button>
+            <a className="sk-btn sk-btn--ghost sk-btn--lg sk-hide-m" href={`tel:${SITE.phoneTel}`}>
+              <Icon name="call" />
+              {SITE.phone}
+            </a>
+          </div>
+          <ul className="sk-hero__trust">
+            {TRUST.map((t) => (
+              <li key={t.label}>
+                <Icon name={t.icon} />
+                {t.label}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-
-      <ul className="sk-hero__chips">
-        <li>⚡ 설치 당일 지급</li>
-        <li>🛡 차액 200% 보상</li>
-        <li>🎁 사은품 골라 받기</li>
-      </ul>
-      <button
-        className="sk-btn sk-btn--glow"
-        onClick={() => onConsult("hero")}
-        ref={ctaRef}
-        type="button"
-      >
-        내 지원금 확인하기
-        <Chev />
-      </button>
-      <p className="sk-hero__sub">상담만 받아도 괜찮아요. 다 비교해 보고 마지막에 연락 주세요</p>
     </section>
   );
 }
@@ -644,157 +707,163 @@ function Breakdown({ asset, onConsult }: { asset: AssetFn; onConsult: (from: str
   const [ref, inView] = useInView<HTMLDivElement>({ threshold: 0.3 });
   const total = BREAKDOWN.reduce((s, b) => s + b.amount, 0);
   return (
-    <section aria-labelledby="breakdown-title" className="sk-sec sk-sec--light" id="breakdown">
-      <Reveal>
-        <NumBadge n="01" />
-        <p className="sk-eyebrow sk-eyebrow--ink">광고에서 본 그 금액</p>
-        <h2 className="sk-title sk-title--ink" id="breakdown-title">
-          {HERO_MAX}만원, <span className="sk-blue">이렇게</span> 받아요
-        </h2>
-      </Reveal>
-
-      <div className={`sk-bd ${inView ? "is-in" : ""}`} ref={ref}>
-        <div aria-hidden="true" className="sk-bd__bar">
-          {BREAKDOWN.map((b, i) => (
-            <span
-              className={`sk-bd__seg sk-bd__seg--${b.tone}`}
-              key={b.label}
-              style={
-                { "--w": `${(b.amount / total) * 100}%`, "--d": `${i * 160}ms` } as CSSProperties
-              }
-            />
-          ))}
+    <section aria-labelledby="breakdown-title" className="sk-sec sk-sec--surface" id="breakdown">
+      <div className="sk-wrap sk-split">
+        <div className="sk-split__side">
+          <Reveal className="sk-head sk-head--left">
+            <p className="sk-kicker">혜택 구성</p>
+            <h2 className="sk-h2" id="breakdown-title">
+              광고에서 본 {HERO_MAX}만원,
+              <br />
+              이렇게 받아요
+            </h2>
+            <p className="sk-lead">
+              인터넷만 쓰셔도 <strong>현금 지원금은 그대로</strong> 받아요.
+              <br className="sk-hide-m" /> 내 조건 금액은 상담으로 1분 만에 확인하세요.
+            </p>
+          </Reveal>
+          <button className="sk-btn sk-btn--primary sk-hide-m sk-split__cta" onClick={() => onConsult("breakdown")} type="button">
+            내 조건 금액 확인하기
+            <Arrow />
+          </button>
         </div>
-        <dl className="sk-bd__list">
-          {BREAKDOWN.map((b) => (
-            <div className="sk-bd__row" key={b.label}>
-              <dt>
-                <i className={`sk-dot sk-dot--${b.tone}`} />
-                {b.label}
-                <small>{b.sub}</small>
-              </dt>
-              <dd>
-                <CountUp run={inView} to={b.amount} />
-                {b.unit}
-              </dd>
-            </div>
-          ))}
-          <div className="sk-bd__row sk-bd__row--total">
-            <dt>최대 합계</dt>
-            <dd>
-              <CountUp duration={1600} run={inView} to={total} />
-              만원
-            </dd>
-          </div>
-        </dl>
-        <p className="sk-fine">구성 금액은 예시 수치입니다. 실제 운영 기준으로 교체해 주세요.</p>
-      </div>
 
-      <Reveal className="sk-bd__note">
-        <Art className="sk-float" size={72} src={asset("brand/ssak-01.webp")} />
-        <p>
-          인터넷만 쓰셔도 <strong>현금 지원금은 그대로</strong> 받아요. 내 조건 금액은 상담으로 1분
-          만에 확인하세요.
-        </p>
-      </Reveal>
-      <button className="sk-btn sk-btn--glow" onClick={() => onConsult("breakdown")} type="button">
-        내 조건 금액 확인하기
-        <Chev />
-      </button>
+        <div className={`sk-card sk-bd ${inView ? "is-in" : ""}`} ref={ref}>
+          <div className="sk-bd__top">
+            <p className="sk-bd__caption">예상 혜택 합계</p>
+            <p className="sk-bd__total">
+              <span>최대</span>
+              <CountUp duration={1600} run={inView} to={total} />
+              <span>만원</span>
+            </p>
+          </div>
+          <div aria-hidden="true" className="sk-bd__bar">
+            {BREAKDOWN.map((b, i) => (
+              <span
+                className={`sk-bd__seg sk-bd__seg--${b.tone}`}
+                key={b.label}
+                style={{ "--w": `${(b.amount / total) * 100}%`, "--d": `${i * 160}ms` } as CSSProperties}
+              />
+            ))}
+          </div>
+          <dl className="sk-bd__list">
+            {BREAKDOWN.map((b) => (
+              <div className="sk-bd__row" key={b.label}>
+                <dt>
+                  <i className={`sk-bd__dot sk-bd__dot--${b.tone}`} />
+                  <span>
+                    {b.label}
+                    <small>{b.sub}</small>
+                  </span>
+                </dt>
+                <dd>
+                  <CountUp run={inView} to={b.amount} />
+                  <span>{b.unit}</span>
+                </dd>
+              </div>
+            ))}
+          </dl>
+          <p className="sk-fine">구성 금액은 예시 수치입니다. 실제 운영 기준으로 교체해 주세요.</p>
+          <Art className="sk-bd__art" size={120} src={asset("3d/moneybag.webp")} />
+        </div>
+
+        <button className="sk-btn sk-btn--primary sk-show-m" onClick={() => onConsult("breakdown")} type="button">
+          내 조건 금액 확인하기
+          <Arrow />
+        </button>
+      </div>
     </section>
   );
 }
 
 /* =====================================================================
- * 3. 비교 (좌우 등장 + 체크 팝 + 타사 열 흐려짐)
+ * 3. 비교 (좌우 등장 + 아이콘 팝 + 타사 열 흐려짐)
  * ===================================================================== */
-function Compare({ asset, onConsult }: { asset: AssetFn; onConsult: (from: string) => void }) {
-  const [ref, inView] = useInView<HTMLTableElement>({ threshold: 0.25 });
+function Compare({ onConsult }: { onConsult: (from: string) => void }) {
+  const [ref, inView] = useInView<HTMLTableElement>({ threshold: 0.2 });
   return (
     <section aria-labelledby="compare-title" className="sk-sec sk-sec--dark" id="compare">
-      <Reveal>
-        <NumBadge n="02" />
-        <p className="sk-eyebrow">비교해 보세요</p>
-        <h2 className="sk-title" id="compare-title">
-          같은 인터넷,
-          <br />
-          받는 돈이 <span className="sk-gold">다릅니다</span>
-        </h2>
-        <p className="sk-lead">통신사 요금은 같고, 차이는 대리점이 정하는 지원금뿐이에요.</p>
-      </Reveal>
+      <div className="sk-wrap sk-wrap--md">
+        <SecHead
+          kicker="타사 비교"
+          lead="통신사 요금은 같고, 차이는 대리점이 정하는 지원금뿐이에요."
+          title={
+            <span id="compare-title">
+              같은 인터넷,
+              <br />
+              받는 돈이 다릅니다
+            </span>
+          }
+        />
 
-      <table className={`sk-cmp ${inView ? "is-in" : ""}`} ref={ref}>
-        <caption className="sk-sr">타사업체와 싹딜 지원금 비교</caption>
-        <colgroup>
-          <col className="sk-cmp__c-other" />
-          <col className="sk-cmp__c-key" />
-          <col className="sk-cmp__c-ours" />
-        </colgroup>
-        <thead>
-          <tr>
-            <th className="sk-cmp__h sk-cmp__h--other" scope="col">
-              타사업체
-            </th>
-            <td />
-            <th className="sk-cmp__h sk-cmp__h--ours" scope="col">
-              <span className="sk-cmp__badge">혜택 최고 보장</span>
-              <span className="sk-cmp__eng">OUR BENEFIT</span>
-              싹딜
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {COMPARE.map((row, i) => {
-            const last = i === COMPARE.length - 1;
-            const cls = [last ? "sk-cmp__total" : "", row.secret ? "sk-cmp__secret" : ""].join(" ").trim();
-            return (
-              <tr className={cls || undefined} key={row.key} style={{ "--i": i } as CSSProperties}>
-                <td className={`sk-cmp__other ${row.otherSmall ? "sk-cmp__other--small" : ""}`}>{row.other}</td>
-                <th className="sk-cmp__key" scope="row">
-                  <span aria-hidden="true" className="sk-cmp__icon">
-                    {row.icon}
-                  </span>
-                  {row.key}
-                </th>
-                <td className="sk-cmp__ours">
-                  <strong className={`sk-cmp__val ${row.accent || last ? "sk-cmp__val--gold" : ""}`}>
-                    {last ? (
-                      <>
-                        <small className="sk-cmp__pre">최대</small>
-                        {row.ours.replace(/^최대\s*/, "")}
-                      </>
-                    ) : (
-                      row.ours
-                    )}
-                  </strong>
-                  {row.sub ? <span className="sk-cmp__sub">{row.sub}</span> : null}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+        <table className={`sk-cmp ${inView ? "is-in" : ""}`} ref={ref}>
+          <caption className="sk-sr">타사업체와 싹딜 지원금 비교</caption>
+          <colgroup>
+            <col className="sk-cmp__c-other" />
+            <col className="sk-cmp__c-key" />
+            <col className="sk-cmp__c-ours" />
+          </colgroup>
+          <thead>
+            <tr>
+              <th className="sk-cmp__h sk-cmp__h--other" scope="col">
+                타사업체
+              </th>
+              <td className="sk-cmp__h sk-cmp__h--key" />
+              <th className="sk-cmp__h sk-cmp__h--ours" scope="col">
+                <span className="sk-cmp__badge">혜택 최고 보장</span>
+                <span className="sk-cmp__eng">OUR BENEFIT</span>
+                싹딜
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {COMPARE.map((row, i) => {
+              const last = i === COMPARE.length - 1;
+              const cls = [last ? "sk-cmp__total" : "", row.secret ? "sk-cmp__secret" : ""].join(" ").trim();
+              return (
+                <tr className={cls || undefined} key={row.key} style={{ "--i": i } as CSSProperties}>
+                  <td className={`sk-cmp__other ${row.otherSmall ? "sk-cmp__other--small" : ""}`}>{row.other}</td>
+                  <th className="sk-cmp__key" scope="row">
+                    <span className="sk-cmp__icon">
+                      <Icon name={row.icon} />
+                    </span>
+                    {row.key}
+                  </th>
+                  <td className="sk-cmp__ours">
+                    {last ? <small className="sk-cmp__pre">최대</small> : null}
+                    <strong className={`sk-cmp__val ${row.accent || last ? "sk-cmp__val--hl" : ""}`}>{row.ours}</strong>
+                    {row.sub ? <span className="sk-cmp__sub">{row.sub}</span> : null}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
 
-      <Reveal className="sk-guard">
-        <Art className="sk-guard__coins sk-float" size={64} src={asset("3d/coins.webp")} />
-        <p className="sk-guard__title">
-          더 받은 곳이 있다면?
-          <br />
-          <span className="sk-gold">차액의 2배</span>로 돌려드립니다
-        </p>
-      </Reveal>
-      <ul className="sk-cmp__notes">
-        {COMPARE_NOTES.map((n) => (
-          <li key={n}>※ {n}</li>
-        ))}
-      </ul>
-      <button className="sk-btn sk-btn--glow" onClick={() => onConsult("compare")} type="button">
-        내 지원금 먼저 확인하기
-        <Chev />
-      </button>
-      <button className="sk-textbtn" onClick={() => onConsult("compare-quote")} type="button">
-        다른 곳 견적 받아 두셨나요? 비교해 드릴게요 ›
-      </button>
+        <Reveal className="sk-guard">
+          <span className="sk-guard__icon">
+            <Icon name="shield" />
+          </span>
+          <p>
+            더 받은 곳이 있다면? <strong>차액의 2배</strong>로 돌려드립니다
+          </p>
+        </Reveal>
+        <ul className="sk-cmp__notes">
+          {COMPARE_NOTES.map((n) => (
+            <li key={n}>※ {n}</li>
+          ))}
+        </ul>
+
+        <div className="sk-btnrow">
+          <button className="sk-btn sk-btn--primary" onClick={() => onConsult("compare")} type="button">
+            내 지원금 먼저 확인하기
+            <Arrow />
+          </button>
+          <button className="sk-btn sk-btn--ghost" onClick={() => onConsult("compare-quote")} type="button">
+            받아 둔 견적 비교받기
+          </button>
+        </div>
+      </div>
     </section>
   );
 }
@@ -802,16 +871,10 @@ function Compare({ asset, onConsult }: { asset: AssetFn; onConsult: (from: strin
 /* =====================================================================
  * 4. 가구별 견적 (탭 전환 + 슬라이딩 필 + 금액 카운트업 + 조건 토글)
  * ===================================================================== */
-function Quote({
-  asset,
-  onConsult,
-}: {
-  asset: AssetFn;
-  onConsult: (from: string, plan?: string) => void;
-}) {
+function Quote({ asset, onConsult }: { asset: AssetFn; onConsult: (from: string, plan?: string) => void }) {
   const [tab, setTab] = useState(0);
   const [noteOpen, setNoteOpen] = useState(false);
-  const [ref, inView] = useInView<HTMLElement>({ threshold: 0.25 });
+  const [ref, inView] = useInView<HTMLDivElement>({ threshold: 0.25 });
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const baseId = useId();
   const plan = PLANS[tab];
@@ -830,63 +893,63 @@ function Quote({
   };
 
   return (
-    <section aria-labelledby="quote-title" className="sk-sec sk-sec--mist" id="quote" ref={ref}>
-      <Reveal>
-        <NumBadge n="03" />
-        <h2 className="sk-title sk-title--ink" id="quote-title">
-          우리 집은 <span className="sk-blue">얼마</span> 받을까요?
-        </h2>
-        <p className="sk-lead sk-lead--ink">가구에 맞는 추천 조건을 골라 보세요</p>
-      </Reveal>
+    <section aria-labelledby="quote-title" className="sk-sec sk-sec--light" id="quote">
+      <div className="sk-wrap sk-split sk-split--quote" ref={ref}>
+        <div className="sk-split__side">
+          <Reveal className="sk-head sk-head--left">
+            <p className="sk-kicker">우리 집 견적</p>
+            <h2 className="sk-h2" id="quote-title">
+              우리 집은
+              <br />
+              얼마 받을까요?
+            </h2>
+            <p className="sk-lead">가구에 맞는 추천 조건을 골라 보세요.</p>
+          </Reveal>
 
-      <div
-        aria-label="가구 유형"
-        className="sk-tabs"
-        onKeyDown={onKey}
-        role="tablist"
-        style={{ "--tab": tab, "--n": PLANS.length } as CSSProperties}
-      >
-        <span aria-hidden="true" className="sk-tabs__pill" />
-        {PLANS.map((p, i) => (
-          <button
-            aria-controls={`${baseId}-panel`}
-            aria-selected={tab === i}
-            className="sk-tabs__btn"
-            id={`${baseId}-tab-${i}`}
-            key={p.tab}
-            onClick={() => select(i)}
-            ref={(el) => {
-              tabRefs.current[i] = el;
-            }}
-            role="tab"
-            tabIndex={tab === i ? 0 : -1}
-            type="button"
-          >
-            {p.tab}
-          </button>
-        ))}
-      </div>
-
-      <article
-        aria-labelledby={`${baseId}-tab-${tab}`}
-        className="sk-plan"
-        id={`${baseId}-panel`}
-        role="tabpanel"
-      >
-        <div className="sk-plan__visual">
-          <div className="sk-plan__swap" key={tab}>
-            <p className="sk-plan__speed">{plan.speed}</p>
-            <p className="sk-plan__product">{plan.product}</p>
-            <p className="sk-plan__label">현금 지원금</p>
-            <p className="sk-plan__cash">
-              <CountUp run={inView} to={plan.cash} />
-              <small>만원</small>
-            </p>
+          <div aria-label="가구 유형" className="sk-tabs" onKeyDown={onKey} role="tablist" style={{ "--tab": tab, "--n": PLANS.length } as CSSProperties}>
+            <span aria-hidden="true" className="sk-tabs__pill" />
+            {PLANS.map((p, i) => (
+              <button
+                aria-controls={`${baseId}-panel`}
+                aria-selected={tab === i}
+                className="sk-tabs__btn"
+                id={`${baseId}-tab-${i}`}
+                key={p.tab}
+                onClick={() => select(i)}
+                ref={(el) => {
+                  tabRefs.current[i] = el;
+                }}
+                role="tab"
+                tabIndex={tab === i ? 0 : -1}
+                type="button"
+              >
+                {p.tab}
+              </button>
+            ))}
           </div>
-          <Art className="sk-plan__art sk-float" size={120} src={asset("3d/router.webp")} />
         </div>
-        <div className="sk-plan__body">
-          <p className="sk-pill-tag">+ 사은품 골라 받기</p>
+
+        <article aria-labelledby={`${baseId}-tab-${tab}`} className="sk-card sk-plan" id={`${baseId}-panel`} role="tabpanel">
+          <div className="sk-plan__head">
+            <div className="sk-plan__swap" key={tab}>
+              <p className="sk-plan__speed">{plan.speed}</p>
+              <p className="sk-plan__product">{plan.product}</p>
+            </div>
+            <Art className="sk-plan__art" size={96} src={asset("3d/router.webp")} />
+          </div>
+          <div className="sk-plan__money">
+            <div>
+              <p className="sk-plan__label">현금 지원금</p>
+              <p className="sk-plan__cash">
+                <CountUp run={inView} to={plan.cash} />
+                <span>만원</span>
+              </p>
+            </div>
+            <span className="sk-tag">
+              <Icon name="gift" />
+              사은품 추가 선택
+            </span>
+          </div>
           <div className="sk-plan__fee">
             <span>월 요금</span>
             <strong>
@@ -906,22 +969,18 @@ function Quote({
           <Collapse id={`${baseId}-note`} open={noteOpen}>
             <p className="sk-plan__note">{plan.note}</p>
           </Collapse>
-          <button
-            className="sk-btn sk-btn--glow"
-            onClick={() => onConsult("quote", plan.tab)}
-            type="button"
-          >
+          <button className="sk-btn sk-btn--primary" onClick={() => onConsult("quote", plan.tab)} type="button">
             이 조건으로 상담받기
-            <Chev />
+            <Arrow />
           </button>
-        </div>
-      </article>
+        </article>
+      </div>
     </section>
   );
 }
 
 /* =====================================================================
- * 5. 사은품 (마우스 3D 틸트 + 전체 보기 시트)
+ * 5. 사은품 (마우스 틸트 + 전체 보기 시트)
  * ===================================================================== */
 function tilt(e: ReactPointerEvent<HTMLElement>) {
   if (e.pointerType !== "mouse" || prefersReducedMotion()) return;
@@ -929,8 +988,8 @@ function tilt(e: ReactPointerEvent<HTMLElement>) {
   const r = el.getBoundingClientRect();
   const x = (e.clientX - r.left) / r.width - 0.5;
   const y = (e.clientY - r.top) / r.height - 0.5;
-  el.style.setProperty("--ry", `${(x * 12).toFixed(2)}deg`);
-  el.style.setProperty("--rx", `${(-y * 12).toFixed(2)}deg`);
+  el.style.setProperty("--ry", `${(x * 8).toFixed(2)}deg`);
+  el.style.setProperty("--rx", `${(-y * 8).toFixed(2)}deg`);
 }
 function untilt(e: ReactPointerEvent<HTMLElement>) {
   e.currentTarget.style.setProperty("--ry", "0deg");
@@ -939,62 +998,74 @@ function untilt(e: ReactPointerEvent<HTMLElement>) {
 
 function Gifts({ asset, onOpenAll }: { asset: AssetFn; onOpenAll: () => void }) {
   return (
-    <section aria-labelledby="gifts-title" className="sk-sec sk-sec--light" id="gifts">
-      <Reveal>
-        <NumBadge n="04" />
-        <h2 className="sk-title sk-title--ink" id="gifts-title">
-          사은품도 <span className="sk-blue">내가</span> 골라요
-        </h2>
-        <p className="sk-lead sk-lead--ink">가입하면 아래 중 1개를 무료로 드려요</p>
-      </Reveal>
-      <ul className="sk-gifts">
-        {GIFTS.map((g, i) => (
-          <li key={g.name}>
-            <Reveal className="sk-gift" delay={i * 90}>
-              <div className="sk-gift__card" onPointerLeave={untilt} onPointerMove={tilt}>
-                <img
-                  alt=""
-                  className="sk-gift__img"
-                  height={240}
-                  loading="lazy"
-                  src={asset(g.img)}
-                  width={240}
-                />
-                <p className="sk-gift__brand">{g.brand}</p>
-                <p className="sk-gift__name">{g.name}</p>
-              </div>
-            </Reveal>
-          </li>
-        ))}
-      </ul>
-      <button className="sk-btn sk-btn--line" onClick={onOpenAll} type="button">
-        사은품 전체 보기 <span className="sk-blue">+{GIFTS_MORE.length}종</span>
-      </button>
-      <p className="sk-fine sk-fine--center">
-        가입 통신사에 따라 선택 가능한 사은품이 다를 수 있어요
-      </p>
+    <section aria-labelledby="gifts-title" className="sk-sec sk-sec--surface" id="gifts">
+      <div className="sk-wrap">
+        <SecHead kicker="사은품" lead="가입하면 아래 중 1개를 무료로 드려요." title={<span id="gifts-title">사은품도 내가 골라요</span>} />
+        <ul className="sk-gifts">
+          {GIFTS.map((g, i) => (
+            <li key={g.name}>
+              <Reveal className="sk-gift" delay={i * 80}>
+                <div className="sk-gift__card" onPointerLeave={untilt} onPointerMove={tilt}>
+                  <div className="sk-gift__media">
+                    <img alt="" className="sk-gift__img" height={240} loading="lazy" src={asset(g.img)} width={240} />
+                  </div>
+                  <p className="sk-gift__brand">{g.brand}</p>
+                  <p className="sk-gift__name">{g.name}</p>
+                </div>
+              </Reveal>
+            </li>
+          ))}
+        </ul>
+        <div className="sk-center">
+          <button className="sk-btn sk-btn--outline" onClick={onOpenAll} type="button">
+            사은품 전체 보기 <span className="sk-mint-d">+{GIFTS_MORE.length}종</span>
+          </button>
+          <p className="sk-fine sk-fine--center">가입 통신사에 따라 선택 가능한 사은품이 다를 수 있어요</p>
+        </div>
+      </div>
     </section>
   );
 }
 
 /* =====================================================================
- * 6. 후기 (자동 슬라이드 + 스와이프 + 점 내비게이션)
+ * 6. 후기 (자동 슬라이드 + 스와이프 + 점 내비게이션, 화면 폭에 따라 1/2/3장)
  * ===================================================================== */
+function Stat({ label, value, suffix, run }: { label: string; value: number; suffix: string; run: boolean }) {
+  return (
+    <div className="sk-stat">
+      <p className="sk-stat__value">
+        <CountUp duration={1600} run={run} to={value} />
+        <span>{suffix}</span>
+      </p>
+      <p className="sk-stat__label">{label}</p>
+    </div>
+  );
+}
+
 function Reviews({ asset }: { asset: AssetFn }) {
   const n = REVIEWS.length;
+  const tablet = useMedia("(min-width: 768px)");
+  const desktop = useMedia("(min-width: 1024px)");
+  const perView = desktop ? 3 : tablet ? 2 : 1;
+  const pages = n - perView + 1;
+
   const [index, setIndex] = useState(0);
   const [hold, setHold] = useState(false);
   const [dragX, setDragX] = useState(0);
   const drag = useRef<{ x: number; id: number } | null>(null);
   const [ref, inView] = useInView<HTMLDivElement>({ threshold: 0.3, once: false });
+  const [statRef, statIn] = useInView<HTMLDivElement>({ threshold: 0.4 });
 
-  const go = useCallback((i: number) => setIndex(((i % n) + n) % n), [n]);
+  const go = useCallback((i: number) => setIndex(((i % pages) + pages) % pages), [pages]);
+  useEffect(() => {
+    setIndex((i) => Math.min(i, pages - 1));
+  }, [pages]);
 
   useEffect(() => {
     if (hold || !inView || prefersReducedMotion()) return;
-    const t = window.setInterval(() => setIndex((v) => (v + 1) % n), 3800);
+    const t = window.setInterval(() => setIndex((v) => (v + 1) % pages), 4000);
     return () => window.clearInterval(t);
-  }, [hold, inView, n]);
+  }, [hold, inView, pages]);
 
   const onDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     drag.current = { x: e.clientX, id: e.pointerId };
@@ -1015,89 +1086,79 @@ function Reviews({ asset }: { asset: AssetFn }) {
   };
 
   return (
-    <section aria-labelledby="reviews-title" className="sk-reviews" id="reviews">
-      <div className="sk-reviews__top">
-        <Art className="sk-reviews__trophy sk-float" size={150} src={asset("3d/trophy.webp")} />
-        <NumBadge n="05" />
-        <h2 className="sk-title" id="reviews-title">
-          먼저 바꾼 분들의
-          <br />
-          <span className="sk-gold">이야기</span>
-        </h2>
-        <p className="sk-lead">싹딜에서 가입한 고객님 후기</p>
-      </div>
+    <section aria-labelledby="reviews-title" className="sk-sec sk-sec--dark" id="reviews">
+      <div className="sk-wrap">
+        <SecHead kicker="고객 후기" lead="싹딜에서 가입한 고객님들이 직접 남긴 후기예요." title={<span id="reviews-title">먼저 바꾼 분들의 이야기</span>} />
 
-      <div
-        aria-roledescription="carousel"
-        className="sk-slider"
-        onBlur={() => setHold(false)}
-        onFocus={() => setHold(true)}
-        onMouseEnter={() => setHold(true)}
-        onMouseLeave={() => setHold(false)}
-        ref={ref}
-      >
-        <div
-          className={`sk-slider__view ${dragX ? "is-drag" : ""}`}
-          onPointerCancel={onUp}
-          onPointerDown={onDown}
-          onPointerMove={onMove}
-          onPointerUp={onUp}
-        >
-          <ul
-            aria-live={hold ? "polite" : "off"}
-            className="sk-slider__track"
-            style={{ transform: `translateX(calc(${index} * -1 * (86% + 12px) + ${dragX}px))` }}
-          >
-            {REVIEWS.map((r, i) => (
-              <li
-                aria-hidden={i !== index}
-                aria-label={`${n}개 중 ${i + 1}번째 후기`}
-                aria-roledescription="slide"
-                className={`sk-review ${i === index ? "is-active" : ""}`}
-                key={r.who + r.tag}
-              >
-                <div className="sk-review__head">
-                  <Art size={44} src={asset("3d/chat.webp")} />
-                  <span aria-label="별점 5점" className="sk-review__stars" role="img">
-                    ★★★★★
-                  </span>
-                  <span className="sk-pill-tag">{r.tag}</span>
-                </div>
-                <p className="sk-review__text">{r.text}</p>
-                <p className="sk-review__who">{r.who} 고객님</p>
-              </li>
-            ))}
-          </ul>
+        <div className="sk-stats" ref={statRef}>
+          {STATS.map((s) => (
+            <Stat key={s.label} run={statIn} {...s} />
+          ))}
         </div>
-        <div className="sk-slider__nav">
-          <button
-            aria-label="이전 후기"
-            className="sk-slider__arrow"
-            onClick={() => go(index - 1)}
-            type="button"
+
+        <div
+          aria-roledescription="carousel"
+          className="sk-slider"
+          onBlur={() => setHold(false)}
+          onFocus={() => setHold(true)}
+          onMouseEnter={() => setHold(true)}
+          onMouseLeave={() => setHold(false)}
+          ref={ref}
+        >
+          <div
+            className={`sk-slider__view ${dragX ? "is-drag" : ""}`}
+            onPointerCancel={onUp}
+            onPointerDown={onDown}
+            onPointerMove={onMove}
+            onPointerUp={onUp}
           >
-            ‹
-          </button>
-          <div className="sk-slider__dots">
-            {REVIEWS.map((r, i) => (
-              <button
-                aria-current={i === index}
-                aria-label={`${i + 1}번째 후기 보기`}
-                className={`sk-slider__dot ${i === index ? "is-active" : ""}`}
-                key={r.who + i}
-                onClick={() => go(i)}
-                type="button"
-              />
-            ))}
+            <ul className="sk-slider__track" style={{ "--idx": index, "--drag": `${dragX}px` } as CSSProperties}>
+              {REVIEWS.map((r, i) => {
+                const visible = i >= index && i < index + perView;
+                return (
+                  <li
+                    aria-hidden={!visible}
+                    aria-label={`${n}개 중 ${i + 1}번째 후기`}
+                    aria-roledescription="slide"
+                    className={`sk-review ${visible ? "is-active" : ""}`}
+                    key={r.who + r.tag}
+                  >
+                    <div className="sk-review__head">
+                      <span aria-label="별점 5점" className="sk-review__stars" role="img">
+                        ★★★★★
+                      </span>
+                      <span className="sk-review__tag">{r.tag}</span>
+                    </div>
+                    <p className="sk-review__text">{r.text}</p>
+                    <div className="sk-review__who">
+                      <Art size={32} src={asset("brand/ssak-03.webp")} />
+                      {r.who} 고객님
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
-          <button
-            aria-label="다음 후기"
-            className="sk-slider__arrow"
-            onClick={() => go(index + 1)}
-            type="button"
-          >
-            ›
-          </button>
+          <div className="sk-slider__nav">
+            <button aria-label="이전 후기" className="sk-slider__arrow" onClick={() => go(index - 1)} type="button">
+              <Arrow />
+            </button>
+            <div className="sk-slider__dots">
+              {Array.from({ length: pages }, (_, i) => (
+                <button
+                  aria-current={i === index}
+                  aria-label={`${i + 1}번째 후기로 이동`}
+                  className={`sk-slider__dot ${i === index ? "is-active" : ""}`}
+                  key={i}
+                  onClick={() => go(i)}
+                  type="button"
+                />
+              ))}
+            </div>
+            <button aria-label="다음 후기" className="sk-slider__arrow sk-slider__arrow--next" onClick={() => go(index + 1)} type="button">
+              <Arrow />
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -1105,39 +1166,30 @@ function Reviews({ asset }: { asset: AssetFn }) {
 }
 
 /* =====================================================================
- * 7. 진행 과정 3단계 (타임라인 선이 차오름)
+ * 7. 진행 과정 3단계 (연결선이 차오름 - 모바일 세로, 데스크톱 가로)
  * ===================================================================== */
 function Steps({ asset }: { asset: AssetFn }) {
   const [ref, inView] = useInView<HTMLOListElement>({ threshold: 0.3 });
   return (
-    <section aria-labelledby="steps-title" className="sk-sec sk-sec--dark" id="steps">
-      <Reveal>
-        <NumBadge n="06" />
-        <h2 className="sk-title" id="steps-title">
-          신청부터 입금까지,
-          <br />
-          <span className="sk-gold">딱 3단계</span>
-        </h2>
-      </Reveal>
-      <ol className={`sk-steps ${inView ? "is-in" : ""}`} ref={ref}>
-        <span aria-hidden="true" className="sk-steps__line" />
-        {STEPS.map((s, i) => (
-          <li
-            className={`sk-step ${i === STEPS.length - 1 ? "sk-step--last" : ""}`}
-            key={s.n}
-            style={{ "--i": i } as CSSProperties}
-          >
-            <span className="sk-step__node">{s.n}</span>
-            <div className="sk-step__card">
-              <div>
-                <h3 className="sk-step__title">{s.title}</h3>
-                <p className="sk-step__text">{s.body}</p>
+    <section aria-labelledby="steps-title" className="sk-sec sk-sec--light" id="steps">
+      <div className="sk-wrap">
+        <SecHead kicker="진행 과정" title={<span id="steps-title">신청부터 입금까지, 딱 3단계</span>} />
+        <ol className={`sk-steps ${inView ? "is-in" : ""}`} ref={ref}>
+          <span aria-hidden="true" className="sk-steps__line" />
+          {STEPS.map((s, i) => (
+            <li className={`sk-step ${i === STEPS.length - 1 ? "sk-step--last" : ""}`} key={s.n} style={{ "--i": i } as CSSProperties}>
+              <span className="sk-step__node">{s.n}</span>
+              <div className="sk-step__card">
+                <Art size={88} src={asset(s.art)} />
+                <div>
+                  <h3 className="sk-step__title">{s.title}</h3>
+                  <p className="sk-step__text">{s.body}</p>
+                </div>
               </div>
-              <Art size={84} src={asset(s.art)} />
-            </div>
-          </li>
-        ))}
-      </ol>
+            </li>
+          ))}
+        </ol>
+      </div>
     </section>
   );
 }
@@ -1145,48 +1197,65 @@ function Steps({ asset }: { asset: AssetFn }) {
 /* =====================================================================
  * 8. FAQ (아코디언, 하나씩 열림)
  * ===================================================================== */
-function Faq() {
+function Faq({ onConsult }: { onConsult: (from: string) => void }) {
   const [open, setOpen] = useState<number | null>(0);
   const baseId = useId();
   return (
-    <section aria-labelledby="faq-title" className="sk-sec sk-sec--light" id="faq">
-      <Reveal>
-        <NumBadge n="07" />
-        <h2 className="sk-title sk-title--ink" id="faq-title">
-          신청 전에 궁금한 점
-        </h2>
-      </Reveal>
-      <div className="sk-faq">
-        {FAQS.map((f, i) => {
-          const isOpen = open === i;
-          return (
-            <div className={`sk-faq__item ${isOpen ? "is-open" : ""}`} key={f.q}>
-              <h3>
-                <button
-                  aria-controls={`${baseId}-a${i}`}
-                  aria-expanded={isOpen}
-                  className="sk-faq__q"
-                  onClick={() => setOpen(isOpen ? null : i)}
-                  type="button"
-                >
-                  <span className="sk-faq__mark">Q</span>
-                  {f.q}
-                  <span aria-hidden="true" className="sk-toggle__icon" />
-                </button>
-              </h3>
-              <Collapse id={`${baseId}-a${i}`} open={isOpen}>
-                <p className="sk-faq__a">{f.a}</p>
-              </Collapse>
-            </div>
-          );
-        })}
+    <section aria-labelledby="faq-title" className="sk-sec sk-sec--surface" id="faq">
+      <div className="sk-wrap sk-split sk-split--faq">
+        <div className="sk-split__side">
+          <Reveal className="sk-head sk-head--left">
+            <p className="sk-kicker">자주 묻는 질문</p>
+            <h2 className="sk-h2" id="faq-title">
+              신청 전에
+              <br />
+              궁금한 점
+            </h2>
+            <p className="sk-lead">찾는 답이 없다면 편하게 물어보세요.</p>
+          </Reveal>
+          <div className="sk-faq__contact sk-hide-m">
+            <a className="sk-faq__tel" href={`tel:${SITE.phoneTel}`}>
+              <Icon name="call" />
+              {SITE.phone}
+            </a>
+            <p>{SITE.hours}</p>
+            <button className="sk-btn sk-btn--outline" onClick={() => onConsult("faq")} type="button">
+              상담 신청하기
+            </button>
+          </div>
+        </div>
+        <div className="sk-faq">
+          {FAQS.map((f, i) => {
+            const isOpen = open === i;
+            return (
+              <div className={`sk-faq__item ${isOpen ? "is-open" : ""}`} key={f.q}>
+                <h3>
+                  <button
+                    aria-controls={`${baseId}-a${i}`}
+                    aria-expanded={isOpen}
+                    className="sk-faq__q"
+                    onClick={() => setOpen(isOpen ? null : i)}
+                    type="button"
+                  >
+                    <span className="sk-faq__mark">Q</span>
+                    <span className="sk-faq__qt">{f.q}</span>
+                    <span aria-hidden="true" className="sk-toggle__icon" />
+                  </button>
+                </h3>
+                <Collapse id={`${baseId}-a${i}`} open={isOpen}>
+                  <p className="sk-faq__a">{f.a}</p>
+                </Collapse>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
 }
 
 /* =====================================================================
- * 상담 신청 폼 (페이지 하단 + 바텀시트 공용)
+ * 상담 신청 폼 (페이지 하단 + 시트 공용)
  * ===================================================================== */
 const PHONE_RE = /^01[016789]-\d{3,4}-\d{4}$/;
 function formatPhone(raw: string) {
@@ -1197,37 +1266,21 @@ function formatPhone(raw: string) {
   return `${d.slice(0, 3)}-${d.slice(3, 7)}-${d.slice(7)}`;
 }
 
-function LeadForm({
-  asset,
-  plan = "",
-  from = "page",
-}: {
-  asset: AssetFn;
-  plan?: string;
-  from?: string;
-}) {
+function LeadForm({ asset, plan = "", from = "page" }: { asset: AssetFn; plan?: string; from?: string }) {
   const uid = useId();
   const [product, setProduct] = useState(PRODUCTS[0].value);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [agree, setAgree] = useState(false);
   const [termOpen, setTermOpen] = useState(false);
-  const [error, setError] = useState<{
-    field: "name" | "phone" | "agree" | "send";
-    text: string;
-  } | null>(null);
+  const [error, setError] = useState<{ field: "name" | "phone" | "agree" | "send"; text: string } | null>(null);
   const [status, setStatus] = useState<"idle" | "sending" | "done">("idle");
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (status === "sending") return;
-    if (name.trim().length < 2)
-      return setError({ field: "name", text: "이름을 2자 이상 입력해 주세요." });
-    if (!PHONE_RE.test(phone))
-      return setError({
-        field: "phone",
-        text: "휴대폰 번호를 010-1234-5678 형식으로 입력해 주세요.",
-      });
+    if (name.trim().length < 2) return setError({ field: "name", text: "이름을 2자 이상 입력해 주세요." });
+    if (!PHONE_RE.test(phone)) return setError({ field: "phone", text: "휴대폰 번호를 010-1234-5678 형식으로 입력해 주세요." });
     if (!agree) return setError({ field: "agree", text: "개인정보 수집·이용에 동의해 주세요." });
     setError(null);
     setStatus("sending");
@@ -1236,21 +1289,18 @@ function LeadForm({
       setStatus("done");
     } catch {
       setStatus("idle");
-      setError({
-        field: "send",
-        text: "신청을 보내지 못했어요. 잠시 후 다시 시도하거나 전화로 문의해 주세요.",
-      });
+      setError({ field: "send", text: "신청을 보내지 못했어요. 잠시 후 다시 시도하거나 전화로 문의해 주세요." });
     }
   };
 
   if (status === "done") {
     return (
       <div aria-live="polite" className="sk-form__done">
-        <Art size={96} src={asset("brand/ssak-03.webp")} />
+        <Art size={88} src={asset("brand/ssak-03.webp")} />
         <p className="sk-form__done-title">신청이 접수됐어요</p>
         <p className="sk-form__done-text">곧 상담사가 내 조건 지원금을 안내해 드릴게요.</p>
         <button
-          className="sk-textbtn sk-textbtn--ink"
+          className="sk-linkbtn"
           onClick={() => {
             setStatus("idle");
             setName("");
@@ -1269,7 +1319,7 @@ function LeadForm({
     <form className="sk-form" noValidate onSubmit={onSubmit}>
       {plan ? (
         <p className="sk-form__plan">
-          선택한 조건: <strong>{plan}</strong>
+          선택한 조건 <strong>{plan}</strong>
         </p>
       ) : null}
       <fieldset className="sk-form__products">
@@ -1285,7 +1335,7 @@ function LeadForm({
                 type="radio"
                 value={p.value}
               />
-              <Art className="sk-tile__art" size={52} src={asset(p.art)} />
+              <Icon className="sk-tile__icon" name={p.icon} />
               <span className="sk-tile__label">{p.value}</span>
             </label>
           ))}
@@ -1321,12 +1371,10 @@ function LeadForm({
       <div className={`sk-consent ${error?.field === "agree" ? "is-error" : ""}`}>
         <div className="sk-consent__row">
           <label className="sk-consent__label">
-            <input
-              checked={agree}
-              className="sk-consent__check"
-              onChange={(e) => setAgree(e.target.checked)}
-              type="checkbox"
-            />
+            <input checked={agree} className="sk-consent__check" onChange={(e) => setAgree(e.target.checked)} type="checkbox" />
+            <span className="sk-consent__box" aria-hidden="true">
+              <Icon name="check" />
+            </span>
             [필수] 개인정보 수집·이용 동의
           </label>
           <button
@@ -1341,8 +1389,7 @@ function LeadForm({
         </div>
         <Collapse id={`${uid}-term`} open={termOpen}>
           <p className="sk-consent__term">
-            수집 항목은 이름, 휴대폰 번호, 관심 상품이에요. 상담 안내 목적으로만 사용하고 상담이
-            끝난 날부터 1년 뒤 파기해요.
+            수집 항목은 이름, 휴대폰 번호, 관심 상품이에요. 상담 안내 목적으로만 사용하고 상담이 끝난 날부터 1년 뒤 파기해요.
           </p>
         </Collapse>
       </div>
@@ -1352,9 +1399,9 @@ function LeadForm({
           {error.text}
         </p>
       ) : null}
-      <button className="sk-btn sk-btn--glow" disabled={status === "sending"} type="submit">
-        {status === "sending" ? "접수 중..." : "상담 신청하기"}
-        {status === "sending" ? null : <Chev />}
+      <button className="sk-btn sk-btn--primary sk-btn--lg" disabled={status === "sending"} type="submit">
+        {status === "sending" ? "접수 중..." : "무료 상담 신청하기"}
+        {status === "sending" ? null : <Arrow />}
       </button>
       <p className="sk-fine sk-fine--center">영업일 기준 순서대로 전화드려요</p>
     </form>
@@ -1364,36 +1411,48 @@ function LeadForm({
 /* =====================================================================
  * 9. 마지막 CTA + 폼
  * ===================================================================== */
-function Apply({
-  asset,
-  sectionRef,
-}: {
-  asset: AssetFn;
-  sectionRef: RefObject<HTMLElement | null>;
-}) {
+function Apply({ asset, sectionRef }: { asset: AssetFn; sectionRef: RefObject<HTMLElement | null> }) {
   return (
-    <section
-      aria-labelledby="apply-title"
-      className="sk-sec sk-sec--deep sk-apply"
-      id="apply"
-      ref={sectionRef}
-    >
-      <Reveal className="sk-apply__card">
-        <Art className="sk-apply__mascot sk-float" size={110} src={asset("brand/ssak-00.webp")} />
-        <h2 className="sk-title sk-title--ink" id="apply-title">
-          비교는 다 해 보세요.
-          <br />
-          마지막에 <span className="sk-blue">싹딜</span>에 물어보세요.
-        </h2>
-        <LeadForm asset={asset} from="apply" />
-      </Reveal>
-      <a className="sk-apply__phone" href={`tel:${SITE.phoneTel}`}>
-        <svg aria-hidden="true" viewBox="0 0 24 24">
-          <path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.6a1 1 0 0 1-.25 1z" />
-        </svg>
-        {SITE.phone}
-      </a>
-      <p className="sk-lead">{SITE.hours}</p>
+    <section aria-labelledby="apply-title" className="sk-sec sk-sec--dark sk-apply" id="apply" ref={sectionRef}>
+      <div className="sk-wrap sk-split sk-split--apply">
+        <div className="sk-split__side">
+          <Reveal className="sk-head sk-head--left">
+            <p className="sk-kicker">상담 신청</p>
+            <h2 className="sk-h2" id="apply-title">
+              비교는 다 해 보세요.
+              <br />
+              마지막에 <span className="sk-mint">싹딜</span>에 물어보세요.
+            </h2>
+          </Reveal>
+          <ul className="sk-apply__points">
+            <li>
+              <Icon name="check" />
+              가입 전에 내 조건 실수령액부터 안내
+            </li>
+            <li>
+              <Icon name="check" />
+              설치 완료 후 1시간 내 계좌 입금
+            </li>
+            <li>
+              <Icon name="check" />
+              더 받은 곳이 있으면 차액의 2배 보상
+            </li>
+          </ul>
+          <a className="sk-apply__tel" href={`tel:${SITE.phoneTel}`}>
+            <span className="sk-apply__tel-icon">
+              <Icon name="call" />
+            </span>
+            <span>
+              <small>전화 상담 · {SITE.hours}</small>
+              {SITE.phone}
+            </span>
+          </a>
+        </div>
+        <Reveal className="sk-card sk-apply__card" delay={120}>
+          <p className="sk-apply__card-title">1분 만에 내 지원금 확인</p>
+          <LeadForm asset={asset} from="apply" />
+        </Reveal>
+      </div>
     </section>
   );
 }
@@ -1401,30 +1460,26 @@ function Apply({
 function Footer({ asset }: { asset: AssetFn }) {
   return (
     <footer className="sk-foot">
-      <img
-        alt={SITE.name}
-        className="sk-foot__logo"
-        height={26}
-        loading="lazy"
-        src={asset("brand/logo-white.webp")}
-        width={52}
-      />
-      <p>회사명: 싹딜 (오픈 전 입력) | 대표자: 오픈 전 입력</p>
-      <p>사업자번호: 오픈 전 입력 | 주소: 오픈 전 입력</p>
-      <p>
-        대표번호 {SITE.phone} | {SITE.hours}
-      </p>
-      <p className="sk-foot__notice">
-        표시된 금액은 가입 통신사·상품·결합 조건에 따라 달라질 수 있습니다. 상담 시 실제 지급 금액을
-        안내해 드립니다.
-      </p>
-      <p className="sk-foot__copy">© 2026 {SITE.name}. ALL RIGHTS RESERVED.</p>
+      <div className="sk-wrap sk-foot__inner">
+        <img alt={SITE.name} className="sk-foot__logo" height={26} loading="lazy" src={asset("brand/logo-white.webp")} width={52} />
+        <div className="sk-foot__info">
+          <p>회사명: 싹딜 (오픈 전 입력) | 대표자: 오픈 전 입력</p>
+          <p>사업자번호: 오픈 전 입력 | 주소: 오픈 전 입력</p>
+          <p>
+            대표번호 {SITE.phone} | {SITE.hours}
+          </p>
+          <p className="sk-foot__notice">
+            표시된 금액은 가입 통신사·상품·결합 조건에 따라 달라질 수 있습니다. 상담 시 실제 지급 금액을 안내해 드립니다.
+          </p>
+          <p className="sk-foot__copy">© 2026 {SITE.name}. ALL RIGHTS RESERVED.</p>
+        </div>
+      </div>
     </footer>
   );
 }
 
 /* =====================================================================
- * 바텀시트 모달 (진입/퇴장 애니메이션, Esc, 배경 클릭, 포커스 가두기)
+ * 시트 모달 (모바일: 아래에서 올라옴 / 태블릿 이상: 가운데 창)
  * ===================================================================== */
 function Sheet({
   open,
@@ -1474,10 +1529,7 @@ function Sheet({
     if (!visible.length) return;
     const first = visible[0];
     const last = visible[visible.length - 1];
-    if (
-      e.shiftKey &&
-      (document.activeElement === first || document.activeElement === panel.current)
-    ) {
+    if (e.shiftKey && (document.activeElement === first || document.activeElement === panel.current)) {
       e.preventDefault();
       last.focus();
     } else if (!e.shiftKey && document.activeElement === last) {
@@ -1489,22 +1541,8 @@ function Sheet({
   if (!render) return null;
   return (
     <div className={`sk-sheet ${shown ? "is-open" : ""}`}>
-      <button
-        aria-label="닫기"
-        className="sk-sheet__dim"
-        onClick={onClose}
-        tabIndex={-1}
-        type="button"
-      />
-      <div
-        aria-labelledby={titleId}
-        aria-modal="true"
-        className="sk-sheet__panel"
-        onKeyDown={trap}
-        ref={panel}
-        role="dialog"
-        tabIndex={-1}
-      >
+      <button aria-label="닫기" className="sk-sheet__dim" onClick={onClose} tabIndex={-1} type="button" />
+      <div aria-labelledby={titleId} aria-modal="true" className="sk-sheet__panel" onKeyDown={trap} ref={panel} role="dialog" tabIndex={-1}>
         <span aria-hidden="true" className="sk-sheet__grab" />
         <div className="sk-sheet__head">
           <div>
@@ -1514,7 +1552,9 @@ function Sheet({
             {sub ? <p className="sk-sheet__sub">{sub}</p> : null}
           </div>
           <button aria-label="닫기" className="sk-sheet__close" onClick={onClose} type="button">
-            ×
+            <svg aria-hidden="true" fill="none" stroke="currentColor" strokeLinecap="round" strokeWidth={2} viewBox="0 0 24 24">
+              <path d="M6 6l12 12M18 6 6 18" />
+            </svg>
           </button>
         </div>
         <div className="sk-sheet__body">{children}</div>
@@ -1529,18 +1569,21 @@ function Sheet({
 function StickyCta({ show, onConsult }: { show: boolean; onConsult: (from: string) => void }) {
   return (
     <div className={`sk-sticky ${show ? "is-show" : ""}`} inert={!show}>
-      <a aria-label="카카오톡 상담" className="sk-sticky__kakao" href={SITE.kakaoUrl}>
-        <svg aria-hidden="true" viewBox="0 0 24 24">
-          <path d="M12 3C6.5 3 2 6.6 2 11c0 2.8 1.9 5.3 4.7 6.7l-1 3.6c-.1.3.3.6.6.4l4.3-2.8c.5.1.9.1 1.4.1 5.5 0 10-3.6 10-8S17.5 3 12 3z" />
-        </svg>
-      </a>
-      <button
-        className="sk-btn sk-btn--glow sk-btn--sweep"
-        onClick={() => onConsult("sticky")}
-        type="button"
-      >
-        내 지원금 1분 만에 확인하기
-      </button>
+      <div className="sk-sticky__inner">
+        <a aria-label="카카오톡 상담" className="sk-sticky__kakao" href={SITE.kakaoUrl}>
+          <Icon name="chat" />
+        </a>
+        <a className="sk-sticky__tel" href={`tel:${SITE.phoneTel}`}>
+          <Icon name="call" />
+          <span>
+            <small>전화 상담</small>
+            {SITE.phone}
+          </span>
+        </a>
+        <button className="sk-btn sk-btn--primary sk-sticky__btn" onClick={() => onConsult("sticky")} type="button">
+          내 지원금 1분 만에 확인하기
+        </button>
+      </div>
     </div>
   );
 }
@@ -1551,14 +1594,12 @@ function ToTop({ lifted }: { lifted: boolean }) {
     <button
       aria-label="맨 위로"
       className={`sk-totop ${show ? "is-show" : ""} ${lifted ? "is-lifted" : ""}`}
-      onClick={() =>
-        window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" })
-      }
+      onClick={() => window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" })}
       tabIndex={show ? 0 : -1}
       type="button"
     >
-      <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M12 5l-7 7m7-7l7 7M12 5v14" />
+      <svg aria-hidden="true" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} viewBox="0 0 24 24">
+        <path d="M12 19V5M6 11l6-6 6 6" />
       </svg>
     </button>
   );
@@ -1600,7 +1641,7 @@ export default function SakdLanding({ assetBase = "/assets/" }: { assetBase?: st
         atApply = e.isIntersecting;
         sync();
       },
-      { threshold: 0.15 },
+      { threshold: 0.1 },
     );
     io1.observe(cta);
     io2.observe(apply);
@@ -1613,51 +1654,31 @@ export default function SakdLanding({ assetBase = "/assets/" }: { assetBase?: st
   return (
     <div className="sk" id="top">
       <ScrollProgress />
-      <div className="sk-page">
-        <Ticker />
-        <Header asset={asset} onConsult={openConsult} />
-        <main>
-          <Hero asset={asset} ctaRef={heroCta} onConsult={openConsult} />
-          <Breakdown asset={asset} onConsult={openConsult} />
-          <Compare asset={asset} onConsult={openConsult} />
-          <Quote asset={asset} onConsult={openConsult} />
-          <Gifts asset={asset} onOpenAll={() => setGiftsOpen(true)} />
-          <Reviews asset={asset} />
-          <Steps asset={asset} />
-          <Faq />
-          <Apply asset={asset} sectionRef={applyRef} />
-        </main>
-        <Footer asset={asset} />
-      </div>
+      <Ticker />
+      <Header asset={asset} onConsult={openConsult} />
+      <main>
+        <Hero asset={asset} ctaRef={heroCta} onConsult={openConsult} />
+        <Breakdown asset={asset} onConsult={openConsult} />
+        <Compare onConsult={openConsult} />
+        <Quote asset={asset} onConsult={openConsult} />
+        <Gifts asset={asset} onOpenAll={() => setGiftsOpen(true)} />
+        <Reviews asset={asset} />
+        <Steps asset={asset} />
+        <Faq onConsult={openConsult} />
+        <Apply asset={asset} sectionRef={applyRef} />
+      </main>
+      <Footer asset={asset} />
 
       <StickyCta onConsult={openConsult} show={showSticky} />
       <ToTop lifted={showSticky} />
 
-      <Sheet
-        onClose={closeConsult}
-        open={sheet.open}
-        sub="상담사가 내 조건 실수령액을 알려 드려요"
-        title="내 지원금 확인하기"
-      >
-        <LeadForm
-          asset={asset}
-          from={sheet.from}
-          key={`${sheet.from}-${sheet.plan}`}
-          plan={sheet.plan}
-        />
+      <Sheet onClose={closeConsult} open={sheet.open} sub="상담사가 내 조건 실수령액을 알려 드려요" title="내 지원금 확인하기">
+        <LeadForm asset={asset} from={sheet.from} key={`${sheet.from}-${sheet.plan}`} plan={sheet.plan} />
       </Sheet>
 
-      <Sheet
-        onClose={closeGifts}
-        open={giftsOpen}
-        sub="가입하면 1개를 무료로 골라요"
-        title="사은품 전체"
-      >
+      <Sheet onClose={closeGifts} open={giftsOpen} sub="가입하면 1개를 무료로 골라요" title="사은품 전체">
         <ul className="sk-giftlist">
-          {[
-            ...GIFTS.map((g) => ({ cat: "대형가전", name: `${g.brand} ${g.name}` })),
-            ...GIFTS_MORE,
-          ].map((g) => (
+          {[...GIFTS.map((g) => ({ cat: "대형가전", name: `${g.brand} ${g.name}` })), ...GIFTS_MORE].map((g) => (
             <li key={g.name}>
               <span>{g.name}</span>
               <small>{g.cat}</small>
@@ -1665,13 +1686,9 @@ export default function SakdLanding({ assetBase = "/assets/" }: { assetBase?: st
           ))}
         </ul>
         <p className="sk-fine">전체 목록은 예시입니다. 실제 사은품 목록으로 교체해 주세요.</p>
-        <button
-          className="sk-btn sk-btn--glow"
-          onClick={() => openConsult("gift-sheet")}
-          type="button"
-        >
+        <button className="sk-btn sk-btn--primary" onClick={() => openConsult("gift-sheet")} type="button">
           이 중에서 골라 상담받기
-          <Chev />
+          <Arrow />
         </button>
       </Sheet>
     </div>
