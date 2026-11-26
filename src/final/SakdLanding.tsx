@@ -65,12 +65,18 @@ const BREAKDOWN = [
   { label: "휴대폰 결합 할인", sub: "3년 합계", amount: 30, unit: "만원", tone: "sky" },
 ] as const;
 
+/* 타사 비교 (타사 수치는 자사 조사 기준) - accent: 금색 강조, secret: 강조 배경 */
 const COMPARE = [
-  { key: "지원금 안내", other: "'최대 금액'만 광고", ours: "내 조건 실수령액 가입 전 공개" },
-  { key: "지급 시점", other: "설치 후 별도 지급", ours: "설치 당일 계좌 입금" },
-  { key: "더 주는 곳이 있다면", other: "보상 없거나 일부만", ours: "차액의 200% 보상" },
-  { key: "사은품", other: "정해진 상품", ours: "원하는 상품 직접 선택" },
-  { key: "총 혜택", other: "상담 전엔 모름", ours: `최대 ${HERO_MAX}만원` },
+  { icon: "🌐", key: "인터넷+TV", other: "35만원", ours: "최대 47만원", sub: "통신사별 상이" },
+  { icon: "📱", key: "휴대폰 개통", other: "40만원", ours: "50만원", sub: "USIM 개통 기준" },
+  { icon: "🔒", key: "비밀지원금", other: "20만원", ours: "상담 시 공개", sub: "추가 지원금 별도 안내", accent: true, secret: true },
+  { icon: "⚡", key: "지급 시점", other: "오후 마감 전\n설치 시 당일", otherSmall: true, ours: "1시간 내 입금", sub: "설치 완료 후 당일", accent: true },
+  { icon: "🛡️", key: "차액 보상", other: "120~130%", ours: "200% 보상", sub: "차액의 2배", accent: true },
+  { icon: "💰", key: "총 지원금액", other: "95만원", ours: `최대 ${HERO_MAX}만원`, sub: "" },
+];
+const COMPARE_NOTES = [
+  "인터넷+TV 사은품은 통신사·상품별로 다릅니다 (SK 40만원 / KT 45만원 / LG U+ 47만원)",
+  "타사업체 수치는 자사 조사 기준이며, 지급 조건 및 차액 보상 세부 기준은 상담 시 안내드립니다",
 ];
 
 type Plan = {
@@ -718,7 +724,7 @@ function Compare({ asset, onConsult }: { asset: AssetFn; onConsult: (from: strin
       </Reveal>
 
       <table className={`sk-cmp ${inView ? "is-in" : ""}`} ref={ref}>
-        <caption className="sk-sr">일반 대리점과 싹딜 비교</caption>
+        <caption className="sk-sr">타사업체와 싹딜 지원금 비교</caption>
         <colgroup>
           <col className="sk-cmp__c-other" />
           <col className="sk-cmp__c-key" />
@@ -727,10 +733,12 @@ function Compare({ asset, onConsult }: { asset: AssetFn; onConsult: (from: strin
         <thead>
           <tr>
             <th className="sk-cmp__h sk-cmp__h--other" scope="col">
-              일반 대리점
+              타사업체
             </th>
             <td />
             <th className="sk-cmp__h sk-cmp__h--ours" scope="col">
+              <span className="sk-cmp__badge">혜택 최고 보장</span>
+              <span className="sk-cmp__eng">OUR BENEFIT</span>
               싹딜
             </th>
           </tr>
@@ -738,23 +746,28 @@ function Compare({ asset, onConsult }: { asset: AssetFn; onConsult: (from: strin
         <tbody>
           {COMPARE.map((row, i) => {
             const last = i === COMPARE.length - 1;
+            const cls = [last ? "sk-cmp__total" : "", row.secret ? "sk-cmp__secret" : ""].join(" ").trim();
             return (
-              <tr
-                className={last ? "sk-cmp__total" : undefined}
-                key={row.key}
-                style={{ "--i": i } as CSSProperties}
-              >
-                <td className="sk-cmp__other">{row.other}</td>
+              <tr className={cls || undefined} key={row.key} style={{ "--i": i } as CSSProperties}>
+                <td className={`sk-cmp__other ${row.otherSmall ? "sk-cmp__other--small" : ""}`}>{row.other}</td>
                 <th className="sk-cmp__key" scope="row">
+                  <span aria-hidden="true" className="sk-cmp__icon">
+                    {row.icon}
+                  </span>
                   {row.key}
                 </th>
                 <td className="sk-cmp__ours">
-                  {!last ? (
-                    <span aria-hidden="true" className="sk-check">
-                      ✓
-                    </span>
-                  ) : null}
-                  {row.ours}
+                  <strong className={`sk-cmp__val ${row.accent || last ? "sk-cmp__val--gold" : ""}`}>
+                    {last ? (
+                      <>
+                        <small className="sk-cmp__pre">최대</small>
+                        {row.ours.replace(/^최대\s*/, "")}
+                      </>
+                    ) : (
+                      row.ours
+                    )}
+                  </strong>
+                  {row.sub ? <span className="sk-cmp__sub">{row.sub}</span> : null}
                 </td>
               </tr>
             );
@@ -763,21 +776,18 @@ function Compare({ asset, onConsult }: { asset: AssetFn; onConsult: (from: strin
       </table>
 
       <Reveal className="sk-guard">
-        <div aria-hidden="true" className="sk-guard__badge">
-          <Art className="sk-guard__coins" size={86} src={asset("3d/coins.webp")} />
-          <span>200%</span>
-        </div>
+        <Art className="sk-guard__coins sk-float" size={64} src={asset("3d/coins.webp")} />
         <p className="sk-guard__title">
-          우리보다 더 주는 곳이 있다면,
+          더 받은 곳이 있다면?
           <br />
-          <span className="sk-gold">차액의 2배</span>를 드려요
+          <span className="sk-gold">차액의 2배</span>로 돌려드립니다
         </p>
-        <ul className="sk-guard__tags">
-          <li>동일 날짜</li>
-          <li>동일 통신사</li>
-          <li>동일 요금제</li>
-        </ul>
       </Reveal>
+      <ul className="sk-cmp__notes">
+        {COMPARE_NOTES.map((n) => (
+          <li key={n}>※ {n}</li>
+        ))}
+      </ul>
       <button className="sk-btn sk-btn--glow" onClick={() => onConsult("compare")} type="button">
         내 지원금 먼저 확인하기
         <Chev />
