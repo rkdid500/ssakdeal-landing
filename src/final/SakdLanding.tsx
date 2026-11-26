@@ -68,23 +68,16 @@ const BREAKDOWN = [
 
 /* 타사 비교 (타사 수치는 자사 조사 기준) */
 type IconName = "wifi" | "phone" | "lock" | "bolt" | "shield" | "wallet" | "users" | "check" | "chat" | "call" | "gift";
-const COMPARE: {
-  icon: IconName;
-  key: string;
-  other: string;
-  ours: string;
-  sub?: string;
-  accent?: boolean;
-  secret?: boolean;
-  otherSmall?: boolean;
-}[] = [
-  { icon: "wifi", key: "인터넷+TV", other: "35만원", ours: "최대 47만원", sub: "통신사별 상이" },
-  { icon: "phone", key: "휴대폰 개통", other: "40만원", ours: "50만원", sub: "USIM 개통 기준" },
-  { icon: "lock", key: "비밀지원금", other: "20만원", ours: "상담 시 공개", sub: "추가 지원금 별도 안내", accent: true, secret: true },
-  { icon: "bolt", key: "지급 시점", other: "오후 마감 전\n설치 시 당일", otherSmall: true, ours: "1시간 내 입금", sub: "설치 완료 후 당일", accent: true },
-  { icon: "shield", key: "차액 보상", other: "120~130%", ours: "200% 보상", sub: "차액의 2배", accent: true },
-  { icon: "wallet", key: "총 지원금액", other: "95만원", ours: `${HERO_MAX}만원` },
+type CmpRow = { emoji: string; key: string; other: string; ours: string; sub?: string; hl?: boolean; secret?: boolean; otherSmall?: boolean };
+const COMPARE: CmpRow[] = [
+  { emoji: "🌐", key: "인터넷+TV", other: "35만원", ours: "최대 47만원", sub: "통신사별 상이" },
+  { emoji: "📱", key: "휴대폰 개통", other: "40만원", ours: "50만원", sub: "USIM 개통 기준" },
+  { emoji: "🔒", key: "비밀지원금", other: "20만원", ours: "상담 시 공개", sub: "추가 지원금 별도 안내", hl: true, secret: true },
+  { emoji: "⚡", key: "지급 시점", other: "오후 마감 전\n설치 시 당일", otherSmall: true, ours: "1시간 내 입금", sub: "설치 완료 후 당일", hl: true },
+  { emoji: "🛡️", key: "차액 보상", other: "120~130%", ours: "200% 보상", sub: "차액의 2배", hl: true },
 ];
+const COMPARE_TOTAL = { emoji: "💰", key: "총 지원금액", other: "95만원", ours: `최대 ${HERO_MAX}만원` };
+const COMPARE_BRAND = "싹딜"; // 이미지 시안처럼 "자사"로 표기하려면 여기만 바꾸면 됩니다
 const COMPARE_NOTES = [
   "인터넷+TV 사은품은 통신사·상품별로 다릅니다 (SK 40만원 / KT 45만원 / LG U+ 47만원)",
   "타사업체 수치는 자사 조사 기준이며, 지급 조건 및 차액 보상 세부 기준은 상담 시 안내드립니다",
@@ -707,7 +700,7 @@ function Breakdown({ asset, onConsult }: { asset: AssetFn; onConsult: (from: str
   const [ref, inView] = useInView<HTMLDivElement>({ threshold: 0.3 });
   const total = BREAKDOWN.reduce((s, b) => s + b.amount, 0);
   return (
-    <section aria-labelledby="breakdown-title" className="sk-sec sk-sec--surface" id="breakdown">
+    <section aria-labelledby="breakdown-title" className="sk-sec sk-sec--light" id="breakdown">
       <div className="sk-wrap sk-split">
         <div className="sk-split__side">
           <Reveal className="sk-head sk-head--left">
@@ -779,88 +772,135 @@ function Breakdown({ asset, onConsult }: { asset: AssetFn; onConsult: (from: str
 /* =====================================================================
  * 3. 비교 (좌우 등장 + 아이콘 팝 + 타사 열 흐려짐)
  * ===================================================================== */
-function Compare({ onConsult }: { onConsult: (from: string) => void }) {
-  const [ref, inView] = useInView<HTMLTableElement>({ threshold: 0.2 });
+/** 문자열 속 숫자 하나를 카운트업 ("최대 47만원" → 최대 0…47만원). 숫자가 없거나 둘 이상이면 그대로 표시 */
+function CountText({ text, run }: { text: string; run: boolean }) {
+  const m = /^(\D*)(\d+)(\D*)$/.exec(text);
+  const v = useCountUp(m ? Number(m[2]) : 0, run && !!m, 1300);
+  if (!m) return <>{text}</>;
   return (
-    <section aria-labelledby="compare-title" className="sk-sec sk-sec--dark" id="compare">
-      <div className="sk-wrap sk-wrap--md">
-        <SecHead
-          kicker="타사 비교"
-          lead="통신사 요금은 같고, 차이는 대리점이 정하는 지원금뿐이에요."
-          title={
-            <span id="compare-title">
-              같은 인터넷,
-              <br />
-              받는 돈이 다릅니다
-            </span>
-          }
-        />
+    <>
+      {m[1]}
+      {Math.round(v)}
+      {m[3]}
+    </>
+  );
+}
 
-        <table className={`sk-cmp ${inView ? "is-in" : ""}`} ref={ref}>
-          <caption className="sk-sr">타사업체와 싹딜 지원금 비교</caption>
-          <colgroup>
-            <col className="sk-cmp__c-other" />
-            <col className="sk-cmp__c-key" />
-            <col className="sk-cmp__c-ours" />
-          </colgroup>
+function Compare({ onConsult }: { onConsult: (from: string) => void }) {
+  const [ref, inView] = useInView<HTMLDivElement>({ threshold: 0.2 });
+  const [hover, setHover] = useState(-1);
+  const total = COMPARE.length;
+  const cell = (base: string, i: number) => `${base} ${hover === i ? "is-hover" : ""}`;
+  const enter = (i: number) => () => setHover(i);
+
+  return (
+    <section aria-labelledby="compare-title" className="sk-sec sk-vs" id="compare">
+      <div className="sk-wrap sk-vs__wrap">
+        <Reveal className="sk-vs__head">
+          <h2 className="sk-vs__title" id="compare-title">
+            타사와 <span>비교표</span>
+          </h2>
+          <p className="sk-vs__sub">통신사 요금은 같고, 차이는 대리점이 정하는 지원금뿐이에요</p>
+        </Reveal>
+
+        {/* 화면 읽기용 표 (보이는 보드는 장식용으로 숨김) */}
+        <table className="sk-sr">
+          <caption>타사업체와 {COMPARE_BRAND} 지원금 비교</caption>
           <thead>
             <tr>
-              <th className="sk-cmp__h sk-cmp__h--other" scope="col">
-                타사업체
-              </th>
-              <td className="sk-cmp__h sk-cmp__h--key" />
-              <th className="sk-cmp__h sk-cmp__h--ours" scope="col">
-                <span className="sk-cmp__badge">혜택 최고 보장</span>
-                <span className="sk-cmp__eng">OUR BENEFIT</span>
-                싹딜
-              </th>
+              <th scope="col">항목</th>
+              <th scope="col">타사업체</th>
+              <th scope="col">{COMPARE_BRAND}</th>
             </tr>
           </thead>
           <tbody>
-            {COMPARE.map((row, i) => {
-              const last = i === COMPARE.length - 1;
-              const cls = [last ? "sk-cmp__total" : "", row.secret ? "sk-cmp__secret" : ""].join(" ").trim();
-              return (
-                <tr className={cls || undefined} key={row.key} style={{ "--i": i } as CSSProperties}>
-                  <td className={`sk-cmp__other ${row.otherSmall ? "sk-cmp__other--small" : ""}`}>{row.other}</td>
-                  <th className="sk-cmp__key" scope="row">
-                    <span className="sk-cmp__icon">
-                      <Icon name={row.icon} />
-                    </span>
-                    {row.key}
-                  </th>
-                  <td className="sk-cmp__ours">
-                    {last ? <small className="sk-cmp__pre">최대</small> : null}
-                    <strong className={`sk-cmp__val ${row.accent || last ? "sk-cmp__val--hl" : ""}`}>{row.ours}</strong>
-                    {row.sub ? <span className="sk-cmp__sub">{row.sub}</span> : null}
-                  </td>
-                </tr>
-              );
-            })}
+            {[...COMPARE, COMPARE_TOTAL].map((r) => (
+              <tr key={r.key}>
+                <th scope="row">{r.key}</th>
+                <td>{r.other.replace("\n", " ")}</td>
+                <td>
+                  {r.ours}
+                  {"sub" in r && r.sub ? ` (${r.sub})` : ""}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
 
-        <Reveal className="sk-guard">
-          <span className="sk-guard__icon">
-            <Icon name="shield" />
-          </span>
+        <div aria-hidden="true" className={`sk-vs__board ${inView ? "is-in" : ""}`} onMouseLeave={() => setHover(-1)} ref={ref}>
+          <div className="sk-vs__col sk-vs__col--other">
+            <div className="sk-vs__h">타사업체</div>
+            {COMPARE.map((r, i) => (
+              <div className={cell("sk-vs__cell", i)} key={r.key} onMouseEnter={enter(i)} style={{ "--i": i } as CSSProperties}>
+                <span className={`sk-vs__other ${r.otherSmall ? "sk-vs__other--small" : ""}`}>
+                  <CountText run={inView} text={r.other} />
+                </span>
+              </div>
+            ))}
+            <div className={cell("sk-vs__cell sk-vs__cell--total", total)} onMouseEnter={enter(total)} style={{ "--i": total } as CSSProperties}>
+              <span className="sk-vs__other sk-vs__other--total">
+                <CountText run={inView} text={COMPARE_TOTAL.other} />
+              </span>
+            </div>
+          </div>
+
+          <div className="sk-vs__col sk-vs__col--key">
+            <div className="sk-vs__h" />
+            {[...COMPARE, COMPARE_TOTAL].map((r, i) => (
+              <div
+                className={cell(`sk-vs__cell ${i === total ? "sk-vs__cell--total" : ""}`, i)}
+                key={r.key}
+                onMouseEnter={enter(i)}
+                style={{ "--i": i } as CSSProperties}
+              >
+                <span className="sk-vs__emoji">{r.emoji}</span>
+                <span className="sk-vs__key">{r.key}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="sk-vs__col sk-vs__col--ours">
+            <span className="sk-vs__badge">혜택 최고 보장</span>
+            <div className="sk-vs__h">
+              <span className="sk-vs__eng">OUR BENEFIT</span>
+              <strong className="sk-vs__brand">{COMPARE_BRAND}</strong>
+            </div>
+            {COMPARE.map((r, i) => (
+              <div
+                className={cell(`sk-vs__cell ${r.secret ? "sk-vs__cell--secret" : ""}`, i)}
+                key={r.key}
+                onMouseEnter={enter(i)}
+                style={{ "--i": i } as CSSProperties}
+              >
+                <strong className={`sk-vs__val ${r.hl ? "sk-vs__val--hl" : ""}`}>
+                  <CountText run={inView} text={r.ours} />
+                </strong>
+                {r.sub ? <span className="sk-vs__subtxt">{r.sub}</span> : null}
+              </div>
+            ))}
+            <div className={cell("sk-vs__cell sk-vs__cell--total", total)} onMouseEnter={enter(total)} style={{ "--i": total } as CSSProperties}>
+              <strong className="sk-vs__val sk-vs__val--total">
+                <CountText run={inView} text={COMPARE_TOTAL.ours} />
+              </strong>
+            </div>
+          </div>
+        </div>
+
+        <Reveal className="sk-vs__promise">
           <p>
-            더 받은 곳이 있다면? <strong>차액의 2배</strong>로 돌려드립니다
+            더 받은 곳이 있다면? <br className="sk-vs__br" />
+            <em>차액의 2배</em>로 돌려드립니다
           </p>
         </Reveal>
-        <ul className="sk-cmp__notes">
+        <ul className="sk-vs__notes">
           {COMPARE_NOTES.map((n) => (
             <li key={n}>※ {n}</li>
           ))}
         </ul>
-
-        <div className="sk-btnrow">
-          <button className="sk-btn sk-btn--primary" onClick={() => onConsult("compare")} type="button">
+        <div className="sk-vs__cta">
+          <button className="sk-btn sk-btn--primary sk-btn--lg" onClick={() => onConsult("compare")} type="button">
             내 지원금 먼저 확인하기
             <Arrow />
-          </button>
-          <button className="sk-btn sk-btn--ghost" onClick={() => onConsult("compare-quote")} type="button">
-            받아 둔 견적 비교받기
           </button>
         </div>
       </div>
