@@ -33,3 +33,17 @@ npm run dev
 
 - `src/lib/site-config.ts`: 대표번호, 상담 시간
 - `src/components/site/landing.tsx`: 혜택 금액, 수치, 후기(현재 시안용 예시), 사업자 정보
+
+## 최종 믹스 버전 (`/final/`)
+
+- 공개 주소: https://rkdid500.github.io/ssakdeal-landing/final/
+- 정보 흐름은 시안 1(sakd-internet-landing), 디자인은 시안 2(이 저장소)를 따릅니다.
+- 외부 라이브러리 없이 React Hook + 순수 CSS만 사용합니다.
+- 복사해서 쓸 파일 2개
+  - `src/final/SakdLanding.tsx`
+  - `src/final/sakd-landing.css`
+- 이미지는 `public/assets/` 아래 `3d/`, `brand/`, `gifts/`에 있습니다.
+  - `<SakdLanding assetBase="/assets/" />`로 경로를 지정합니다.
+- 운영 전 교체할 곳
+  - 파일 맨 위 CONFIG 블록: 전화번호, 카카오 링크, 금액, 후기
+  - `submitLead()`: 상담 신청 접수 API
