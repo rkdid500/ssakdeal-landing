@@ -1197,7 +1197,7 @@ function Steps({ asset }: { asset: AssetFn }) {
 /* =====================================================================
  * 8. FAQ (아코디언, 하나씩 열림)
  * ===================================================================== */
-function Faq({ onConsult }: { onConsult: (from: string) => void }) {
+function Faq() {
   const [open, setOpen] = useState<number | null>(0);
   const baseId = useId();
   return (
@@ -1213,16 +1213,6 @@ function Faq({ onConsult }: { onConsult: (from: string) => void }) {
             </h2>
             <p className="sk-lead">찾는 답이 없다면 편하게 물어보세요.</p>
           </Reveal>
-          <div className="sk-faq__contact sk-hide-m">
-            <a className="sk-faq__tel" href={`tel:${SITE.phoneTel}`}>
-              <Icon name="call" />
-              {SITE.phone}
-            </a>
-            <p>{SITE.hours}</p>
-            <button className="sk-btn sk-btn--outline" onClick={() => onConsult("faq")} type="button">
-              상담 신청하기
-            </button>
-          </div>
         </div>
         <div className="sk-faq">
           {FAQS.map((f, i) => {
@@ -1664,7 +1654,7 @@ export default function SakdLanding({ assetBase = "/assets/" }: { assetBase?: st
         <Gifts asset={asset} onOpenAll={() => setGiftsOpen(true)} />
         <Reviews asset={asset} />
         <Steps asset={asset} />
-        <Faq onConsult={openConsult} />
+        <Faq />
         <Apply asset={asset} sectionRef={applyRef} />
       </main>
       <Footer asset={asset} />

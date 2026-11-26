@@ -2195,37 +2195,6 @@
   font-size: 15px;
   line-height: 1.75;
 }
-.sk-faq__contact {
-  display: grid;
-  gap: 6px;
-  justify-items: start;
-  padding: 28px;
-  background: var(--white);
-  border: 1px solid var(--line);
-  border-radius: 20px;
-}
-.sk-faq__tel {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--ink);
-  font-size: 28px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  font-variant-numeric: tabular-nums;
-}
-.sk-faq__tel .sk-icon {
-  width: 22px;
-  height: 22px;
-  color: var(--mint-d);
-}
-.sk-faq__contact p {
-  color: var(--muted);
-  font-size: 14px;
-}
-.sk-faq__contact .sk-btn {
-  margin-top: 12px;
-}
 @media (min-width: 1024px) {
   .sk-faq__q {
     min-height: 72px;
