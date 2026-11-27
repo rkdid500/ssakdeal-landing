@@ -43,7 +43,7 @@ const SITE = {
 const NAV = [
   { id: "breakdown", label: "혜택 구성" },
   { id: "compare", label: "타사 비교" },
-  { id: "quote", label: "우리 집 견적" },
+  { id: "why", label: "선택 이유" },
   { id: "gifts", label: "사은품" },
   { id: "reviews", label: "고객 후기" },
   { id: "faq", label: "자주 묻는 질문" },
@@ -83,33 +83,32 @@ const COMPARE_NOTES = [
   "타사업체 수치는 자사 조사 기준이며, 지급 조건 및 차액 보상 세부 기준은 상담 시 안내드립니다",
 ];
 
-type Plan = { tab: string; product: string; speed: string; cash: number; fee: number; note: string };
-const PLANS: Plan[] = [
+/* 싹딜을 선택하는 이유 */
+const WHY = [
   {
-    tab: "1인 가구",
-    product: "LG헬로비전 광랜라이트 인터넷",
-    speed: "100Mbps",
-    cash: 13,
-    fee: 21890,
-    note: "인터넷 단독 / 공유기 포함 / 3년 약정 · VAT 포함 · 휴대폰·카드 할인 제외 / 가입·설치 조건 상담 확인",
+    n: "01",
+    title: "설치 당일 1시간 이내 입금",
+    body: "설치가 끝나면 1시간 안에 고객님 계좌로 바로 입금해 드려요.",
+    note: "설치 완료 당일 기준",
   },
   {
-    tab: "2~3인",
-    product: "LG헬로비전 기가라이트 인터넷 + TV",
-    speed: "500Mbps",
-    cash: 31,
-    fee: 32890,
-    note: "인터넷 + 헬로tv플러스(102채널) / 공유기 포함 / 3년 약정 · VAT 포함 · 휴대폰·카드 할인 제외 / 가입·설치 조건 상담 확인",
+    n: "02",
+    title: "차액 200% 보장",
+    body: "다른 곳에서 더 받으셨다면 그 차액의 2배를 돌려드려요.",
+    note: "동일 날짜 / 동일 통신사 / 동일 요금제 기준",
   },
   {
-    tab: "가족",
-    product: "LG헬로비전 플래티넘기가 인터넷 + TV",
-    speed: "1Gbps",
-    cash: 34,
-    fee: 34100,
-    note: "인터넷 + 헬로tv플러스(102채널) / 공유기 포함 / 3년 약정 · VAT 포함 · 휴대폰·카드 할인 제외 / 가입·설치 조건 상담 확인",
+    n: "03",
+    title: "최고의 조건으로 싹-딜",
+    body: "통신사별 조건을 모두 비교해 가장 많이 받는 조합으로 안내해요.",
+  },
+  {
+    n: "04",
+    title: "내게 맞는 혜택 찾기",
+    body: "사용 패턴과 가구원 수에 맞춰 꼭 필요한 상품만 정확하게 추천해요.",
   },
 ];
+const WHY_CHIPS = ["인터넷", "TV", "휴대폰", "결합 할인", "1인 가구", "가족", "기가 인터넷", "사은품"];
 
 const GIFTS = [
   { img: "gifts/gift-tv.webp", brand: "삼성전자", name: "43인치 4K UHD TV" },
@@ -908,113 +907,133 @@ function Compare({ onConsult }: { onConsult: (from: string) => void }) {
 }
 
 /* =====================================================================
- * 4. 가구별 견적 (탭 전환 + 슬라이딩 필 + 금액 카운트업 + 조건 토글)
+ * 4. 싹딜을 선택하는 이유 (카드 4개, 화면에 들어오면 각 그림이 움직임)
  * ===================================================================== */
-function Quote({ asset, onConsult }: { asset: AssetFn; onConsult: (from: string, plan?: string) => void }) {
-  const [tab, setTab] = useState(0);
-  const [noteOpen, setNoteOpen] = useState(false);
-  const [ref, inView] = useInView<HTMLDivElement>({ threshold: 0.25 });
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const baseId = useId();
-  const plan = PLANS[tab];
-
-  const select = (i: number) => {
-    setTab(i);
-    setNoteOpen(false);
-  };
-  const onKey = (e: ReactKeyboardEvent<HTMLDivElement>) => {
-    const dir = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
-    if (!dir) return;
-    e.preventDefault();
-    const next = (tab + dir + PLANS.length) % PLANS.length;
-    select(next);
-    tabRefs.current[next]?.focus();
-  };
-
-  return (
-    <section aria-labelledby="quote-title" className="sk-sec sk-sec--light" id="quote">
-      <div className="sk-wrap sk-split sk-split--quote" ref={ref}>
-        <div className="sk-split__side">
-          <Reveal className="sk-head sk-head--left">
-            <p className="sk-kicker">우리 집 견적</p>
-            <h2 className="sk-h2" id="quote-title">
-              우리 집은
-              <br />
-              얼마 받을까요?
-            </h2>
-            <p className="sk-lead">가구에 맞는 추천 조건을 골라 보세요.</p>
-          </Reveal>
-
-          <div aria-label="가구 유형" className="sk-tabs" onKeyDown={onKey} role="tablist" style={{ "--tab": tab, "--n": PLANS.length } as CSSProperties}>
-            <span aria-hidden="true" className="sk-tabs__pill" />
-            {PLANS.map((p, i) => (
-              <button
-                aria-controls={`${baseId}-panel`}
-                aria-selected={tab === i}
-                className="sk-tabs__btn"
-                id={`${baseId}-tab-${i}`}
-                key={p.tab}
-                onClick={() => select(i)}
-                ref={(el) => {
-                  tabRefs.current[i] = el;
-                }}
-                role="tab"
-                tabIndex={tab === i ? 0 : -1}
-                type="button"
-              >
-                {p.tab}
-              </button>
-            ))}
-          </div>
+function WhyVisual({ n, asset }: { n: string; asset: AssetFn }) {
+  if (n === "01")
+    return (
+      <div className="sk-why__vis sk-why__vis--timer">
+        <svg aria-hidden="true" className="sk-why__ring" viewBox="0 0 160 160">
+          <circle className="sk-why__ring-track" cx="80" cy="80" r="68" />
+          <circle className="sk-why__ring-bar" cx="80" cy="80" pathLength="100" r="68" />
+        </svg>
+        <div className="sk-why__timer-text">
+          <strong>1시간</strong>
+          <span>이내 입금</span>
         </div>
-
-        <article aria-labelledby={`${baseId}-tab-${tab}`} className="sk-card sk-plan" id={`${baseId}-panel`} role="tabpanel">
-          <div className="sk-plan__head">
-            <div className="sk-plan__swap" key={tab}>
-              <p className="sk-plan__speed">{plan.speed}</p>
-              <p className="sk-plan__product">{plan.product}</p>
-            </div>
-            <Art className="sk-plan__art" size={96} src={asset("3d/router.webp")} />
-          </div>
-          <div className="sk-plan__money">
-            <div>
-              <p className="sk-plan__label">현금 지원금</p>
-              <p className="sk-plan__cash">
-                <CountUp run={inView} to={plan.cash} />
-                <span>만원</span>
-              </p>
-            </div>
-            <span className="sk-tag">
-              <Icon name="gift" />
-              사은품 추가 선택
+        <span className="sk-why__toast sk-why__toast--a">
+          <Icon name="check" />
+          설치 완료
+        </span>
+        <span className="sk-why__toast sk-why__toast--b">
+          <Icon name="wallet" />
+          입금 완료
+        </span>
+      </div>
+    );
+  if (n === "02")
+    return (
+      <div className="sk-why__vis sk-why__vis--guard">
+        <Art className="sk-why__coin sk-why__coin--a" size={110} src={asset("3d/coins.webp")} />
+        <Art className="sk-why__coin sk-why__coin--b" size={64} src={asset("3d/coins.webp")} />
+        <p className="sk-why__big">
+          차액
+          <strong>200%</strong>
+        </p>
+        <ul className="sk-why__pills">
+          <li>동일 날짜</li>
+          <li>동일 통신사</li>
+          <li>동일 요금제</li>
+        </ul>
+      </div>
+    );
+  if (n === "03")
+    return (
+      <div className="sk-why__vis sk-why__vis--bars">
+        <ul className="sk-why__bars">
+          <li style={{ "--h": "42%", "--i": 0 } as CSSProperties}>
+            <span className="sk-why__bar" />
+            <em>A업체</em>
+          </li>
+          <li style={{ "--h": "60%", "--i": 1 } as CSSProperties}>
+            <span className="sk-why__bar" />
+            <em>B업체</em>
+          </li>
+          <li className="is-ours" style={{ "--h": "100%", "--i": 2 } as CSSProperties}>
+            <span className="sk-why__crown">최고 조건</span>
+            <span className="sk-why__bar" />
+            <em>싹딜</em>
+          </li>
+        </ul>
+      </div>
+    );
+  return (
+    <div className="sk-why__vis sk-why__vis--match">
+      <div className="sk-why__marquee">
+        <div className="sk-why__marquee-track">
+          {[0, 1].map((k) => (
+            <span className="sk-why__marquee-set" key={k}>
+              {WHY_CHIPS.map((c) => (
+                <span className="sk-why__chip" key={c}>
+                  {c}
+                </span>
+              ))}
             </span>
-          </div>
-          <div className="sk-plan__fee">
-            <span>월 요금</span>
-            <strong>
-              <CountUp duration={900} run={inView} to={plan.fee} />원
-            </strong>
-          </div>
-          <button
-            aria-controls={`${baseId}-note`}
-            aria-expanded={noteOpen}
-            className={`sk-toggle ${noteOpen ? "is-open" : ""}`}
-            onClick={() => setNoteOpen((v) => !v)}
-            type="button"
-          >
-            조건 보기
-            <span aria-hidden="true" className="sk-toggle__icon" />
-          </button>
-          <Collapse id={`${baseId}-note`} open={noteOpen}>
-            <p className="sk-plan__note">{plan.note}</p>
-          </Collapse>
-          <button className="sk-btn sk-btn--primary" onClick={() => onConsult("quote", plan.tab)} type="button">
-            이 조건으로 상담받기
+          ))}
+        </div>
+      </div>
+      <span className="sk-why__pick">딱 맞는 혜택</span>
+      <Art className="sk-why__lens" size={200} src={asset("3d/magnifier.webp")} />
+    </div>
+  );
+}
+
+function Why({ asset, onConsult }: { asset: AssetFn; onConsult: (from: string) => void }) {
+  return (
+    <section aria-labelledby="why-title" className="sk-sec sk-sec--dark sk-why" id="why">
+      <div className="sk-wrap">
+        <SecHead
+          kicker="싹딜을 선택하는 이유"
+          lead={
+            <>
+              같은 통신사, 같은 요금제라도 어디서 가입하느냐에 따라 받는 돈이 달라져요.
+              <br className="sk-hide-m" /> 싹딜은 확실한 기준으로 답을 드립니다.
+            </>
+          }
+          title={<span id="why-title">왜 싹딜이어야 할까요?</span>}
+        />
+        <ul className="sk-why__grid">
+          {WHY.map((w, i) => (
+            <li key={w.n}>
+              <WhyCard asset={asset} delay={i * 90} item={w} />
+            </li>
+          ))}
+        </ul>
+        <div className="sk-center">
+          <button className="sk-btn sk-btn--primary sk-btn--lg sk-why__cta" onClick={() => onConsult("why")} type="button">
+            내 조건으로 상담받기
             <Arrow />
           </button>
-        </article>
+        </div>
       </div>
     </section>
+  );
+}
+
+function WhyCard({ item, asset, delay }: { item: (typeof WHY)[number]; asset: AssetFn; delay: number }) {
+  const [ref, inView] = useInView<HTMLElement>({ threshold: 0.35 });
+  return (
+    <article className={`sk-why__card ${inView ? "is-in" : ""}`} ref={ref} style={{ "--d": `${delay}ms` } as CSSProperties}>
+      <div aria-hidden="true" className="sk-why__media">
+        <WhyVisual asset={asset} n={item.n} />
+      </div>
+      <div className="sk-why__body">
+        <span className="sk-why__num">{item.n}</span>
+        <h3 className="sk-why__title">{item.title}</h3>
+        <p className="sk-why__text">{item.body}</p>
+        {item.note ? <p className="sk-why__note">({item.note})</p> : null}
+      </div>
+    </article>
   );
 }
 
@@ -1689,7 +1708,7 @@ export default function SakdLanding({ assetBase = "/assets/" }: { assetBase?: st
         <Hero asset={asset} ctaRef={heroCta} onConsult={openConsult} />
         <Breakdown asset={asset} onConsult={openConsult} />
         <Compare onConsult={openConsult} />
-        <Quote asset={asset} onConsult={openConsult} />
+        <Why asset={asset} onConsult={openConsult} />
         <Gifts asset={asset} onOpenAll={() => setGiftsOpen(true)} />
         <Reviews asset={asset} />
         <Steps asset={asset} />

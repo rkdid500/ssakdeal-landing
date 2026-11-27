@@ -198,9 +198,6 @@
     gap: 72px;
     align-items: center;
   }
-  .sk-split--quote {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  }
   .sk-split--faq {
     grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
     align-items: start;
@@ -1690,121 +1687,388 @@
   }
 }
 
-/* ---------- 4. quote ---------- */
-.sk-tabs {
-  position: relative;
+/* ---------- 4. why (싹딜을 선택하는 이유) ---------- */
+.sk-why__grid {
   display: grid;
-  grid-template-columns: repeat(var(--n), 1fr);
-  padding: 4px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 16px;
+  gap: 16px;
 }
-.sk-tabs__pill {
-  position: absolute;
-  top: 4px;
-  bottom: 4px;
-  left: 4px;
-  width: calc((100% - 8px) / var(--n));
+.sk-why__card {
+  height: 100%;
+  overflow: hidden;
+  color: var(--ink);
   background: var(--white);
-  border-radius: 12px;
-  box-shadow: 0 1px 2px rgba(11, 27, 46, 0.06), 0 4px 12px rgba(11, 27, 46, 0.08);
-  transform: translateX(calc(var(--tab) * 100%));
-  transition: transform 0.45s var(--spring);
+  border-radius: 28px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  transition: transform 0.35s var(--ease), box-shadow 0.35s ease;
 }
-.sk-tabs__btn {
+.sk-why__card:hover {
+  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.35);
+  transform: translateY(-4px);
+}
+.sk-why__media {
   position: relative;
-  min-height: 48px;
-  color: var(--muted) !important;
-  font-size: 15.5px !important;
-  font-weight: 700;
-  background: none;
-  border: 0;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: color 0.25s ease;
+  height: 230px;
+  overflow: hidden;
 }
-.sk-tabs__btn[aria-selected="true"] {
-  color: var(--ink) !important;
+.sk-why__vis {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
 }
-.sk-plan__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--line);
+.sk-why__body {
+  padding: 26px 22px 30px;
+  text-align: center;
 }
-.sk-plan__speed {
-  display: inline-block;
-  padding: 4px 10px;
+.sk-why__num {
+  display: inline-grid;
+  place-items: center;
+  min-width: 38px;
+  height: 30px;
+  padding: 0 8px;
   color: var(--mint-d);
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 14px;
+  font-weight: 800;
   background: var(--mint-soft);
   border-radius: 8px;
 }
-.sk-plan__product {
-  margin-top: 8px;
+.sk-why__title {
+  margin-top: 14px;
   color: var(--ink);
-  font-size: 17px;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+.sk-why__text {
+  margin-top: 8px;
+  color: var(--ink-2);
+  font-size: 15.5px;
+  line-height: 1.65;
+}
+.sk-why__note {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.sk-why__cta {
+  width: auto;
+  min-width: 280px;
+}
+@media (max-width: 767.98px) {
+  .sk-why__cta {
+    width: 100%;
+    min-width: 0;
+  }
+}
+@media (min-width: 768px) {
+  .sk-why__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .sk-why__media {
+    height: 270px;
+  }
+  .sk-why__body {
+    padding: 30px 28px 34px;
+  }
+  .sk-why__title {
+    font-size: 25px;
+  }
+  .sk-why__text {
+    font-size: 16.5px;
+  }
+}
+@media (min-width: 1024px) {
+  .sk-why__grid {
+    gap: 28px;
+  }
+  .sk-why__media {
+    height: 300px;
+  }
+}
+
+/* 01 타이머 */
+.sk-why__vis--timer {
+  background:
+    radial-gradient(60% 60% at 50% 50%, rgba(28, 208, 146, 0.22), transparent 70%),
+    linear-gradient(160deg, #0d1c38, #07111f);
+}
+.sk-why__ring {
+  width: 172px;
+  height: 172px;
+  transform: rotate(-90deg);
+}
+.sk-why__ring circle {
+  fill: none;
+  stroke-width: 10;
+}
+.sk-why__ring-track {
+  stroke: rgba(255, 255, 255, 0.08);
+}
+.sk-why__ring-bar {
+  stroke: var(--mint);
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 0;
+  filter: drop-shadow(0 0 8px rgba(28, 208, 146, 0.6));
+}
+.sk-why__timer-text {
+  position: absolute;
+  display: grid;
+  justify-items: center;
+  color: var(--white);
+  line-height: 1.1;
+}
+.sk-why__timer-text strong {
+  font-size: 36px;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+}
+.sk-why__timer-text span {
+  margin-top: 4px;
+  color: var(--mint);
+  font-size: 14px;
   font-weight: 700;
-  line-height: 1.4;
+}
+.sk-why__toast {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+}
+.sk-why__toast .sk-icon {
+  width: 22px;
+  height: 22px;
+  padding: 4px;
+  color: var(--mint-ink);
+  background: var(--mint);
+  border-radius: 7px;
+}
+.sk-why__toast--a {
+  top: 30px;
+  left: 8%;
+}
+.sk-why__toast--b {
+  right: 8%;
+  bottom: 30px;
+}
+
+/* 02 차액 200% */
+.sk-why__vis--guard {
+  align-content: center;
+  gap: 16px;
+  background:
+    radial-gradient(55% 60% at 50% 45%, rgba(47, 107, 255, 0.35), transparent 70%),
+    linear-gradient(160deg, #0f1f45, #070f22);
+}
+.sk-why__big {
+  display: grid;
+  justify-items: center;
+  color: var(--white);
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
   letter-spacing: -0.03em;
 }
-.sk-plan__art {
-  flex: none;
-  width: 80px;
-  height: 80px;
+.sk-why__big strong {
+  margin-top: 6px;
+  font-size: 72px;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  background: linear-gradient(180deg, #ffffff, #b9cbff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
-.sk-plan__money {
+.sk-why__pills {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 8px;
-  padding-top: 20px;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 12px;
 }
-.sk-plan__label {
-  color: var(--ink-2);
-  font-size: 14.5px;
-  font-weight: 600;
-}
-.sk-plan__cash {
-  color: var(--ink);
-  font-size: 56px;
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -0.05em;
-  font-variant-numeric: tabular-nums;
-}
-.sk-plan__cash span {
-  margin-left: 4px;
-  color: var(--ink-2);
-  font-size: 22px;
+.sk-why__pills li {
+  padding: 7px 12px;
+  color: var(--white);
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  background: #1e3fae;
+  border-radius: 999px;
 }
-.sk-plan__fee {
+.sk-why__coin {
+  position: absolute;
+}
+.sk-why__coin--a {
+  top: 16px;
+  right: 8%;
+  width: 96px;
+  height: 96px;
+}
+.sk-why__coin--b {
+  bottom: 22px;
+  left: 8%;
+  width: 56px;
+  height: 56px;
+  opacity: 0.85;
+}
+
+/* 03 막대 비교 */
+.sk-why__vis--bars {
+  background: linear-gradient(180deg, #e7f9f1, #f6fdf9);
+}
+.sk-why__bars {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  margin-top: 20px;
-  padding: 16px 18px;
-  background: var(--surface);
-  border-radius: 14px;
+  align-items: flex-end;
+  gap: 18px;
+  height: 72%;
+  padding-top: 26px;
 }
-.sk-plan__fee span {
-  color: var(--ink-2);
+.sk-why__bars li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+}
+.sk-why__bar {
+  display: block;
+  width: 56px;
+  height: var(--h);
+  background: linear-gradient(180deg, #d7dee8, #c3ccd8);
+  border-radius: 12px 12px 6px 6px;
+}
+.sk-why__bars .is-ours .sk-why__bar {
+  width: 68px;
+  background: linear-gradient(180deg, #3ee4ad, var(--mint));
+  box-shadow: 0 12px 28px rgba(28, 208, 146, 0.4);
+}
+.sk-why__bars em {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 13.5px;
+  font-style: normal;
+  font-weight: 700;
+}
+.sk-why__bars .is-ours em {
+  color: var(--mint-d);
   font-size: 15px;
-  font-weight: 600;
-}
-.sk-plan__fee strong {
-  font-size: 24px;
   font-weight: 800;
-  letter-spacing: -0.035em;
-  font-variant-numeric: tabular-nums;
 }
+.sk-why__crown {
+  position: absolute;
+  top: -34px;
+  padding: 5px 10px;
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+  background: var(--ink);
+  border-radius: 8px;
+}
+.sk-why__crown::after {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  content: "";
+  background: var(--ink);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+/* 04 맞춤 혜택 */
+.sk-why__vis--match {
+  background: linear-gradient(180deg, #e8ecfb, #f1f4fd);
+}
+.sk-why__marquee {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  overflow: hidden;
+  transform: translateY(-50%);
+}
+.sk-why__marquee-track {
+  display: flex;
+  width: max-content;
+}
+.sk-why__marquee-set {
+  display: flex;
+  flex: none;
+  gap: 12px;
+  padding-right: 12px;
+}
+.sk-why__chip {
+  padding: 14px 20px;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 800;
+  white-space: nowrap;
+  background: var(--white);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(11, 27, 46, 0.06);
+}
+.sk-why__pick {
+  position: relative;
+  z-index: 1;
+  padding: 16px 22px;
+  color: var(--white);
+  font-size: 17px;
+  font-weight: 800;
+  white-space: nowrap;
+  background: #1e3fae;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(30, 63, 174, 0.35);
+  translate: -36px 0;
+}
+.sk-why__lens {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  width: 150px;
+  height: 150px;
+  margin: -34px 0 0 6px;
+  filter: drop-shadow(0 16px 24px rgba(11, 27, 46, 0.25));
+}
+@media (min-width: 1024px) {
+  .sk-why__ring {
+    width: 196px;
+    height: 196px;
+  }
+  .sk-why__timer-text strong {
+    font-size: 42px;
+  }
+  .sk-why__big strong {
+    font-size: 88px;
+  }
+  .sk-why__bar {
+    width: 64px;
+  }
+  .sk-why__bars .is-ours .sk-why__bar {
+    width: 78px;
+  }
+  .sk-why__lens {
+    width: 176px;
+    height: 176px;
+    margin: -40px 0 0 14px;
+  }
+  .sk-why__pick {
+    font-size: 18px;
+    translate: -44px 0;
+  }
+}
+
 .sk-toggle {
   display: inline-flex;
   align-items: center;
@@ -1864,28 +2128,6 @@
 .sk-collapse__inner {
   min-height: 0;
   overflow: hidden;
-}
-.sk-plan__note {
-  padding: 0 0 6px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.65;
-}
-.sk-plan .sk-btn {
-  margin-top: 14px;
-}
-@media (min-width: 1024px) {
-  .sk-plan__cash {
-    font-size: 68px;
-  }
-  .sk-plan__art {
-    width: 104px;
-    height: 104px;
-  }
-  .sk-tabs__btn {
-    min-height: 54px;
-    font-size: 16.5px !important;
-  }
 }
 
 /* ---------- 5. gifts ---------- */
@@ -3061,6 +3303,16 @@
     box-shadow: 0 30px 80px rgba(37, 99, 235, 0.42), 0 0 0 10px rgba(91, 149, 249, 0.14);
   }
 }
+@keyframes sk-marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes sk-pulse {
+  50% {
+    box-shadow: 0 10px 24px rgba(30, 63, 174, 0.35), 0 0 0 8px rgba(30, 63, 174, 0.12);
+  }
+}
 @keyframes sk-breathe {
   50% {
     opacity: 0.7;
@@ -3080,9 +3332,6 @@
   }
   .sk-dot-live::after {
     animation: sk-ping 1.8s ease-out infinite;
-  }
-  .sk-plan__swap {
-    animation: sk-swap 0.45s var(--ease);
   }
 
   /* 스크롤 등장 */
@@ -3138,8 +3387,7 @@
   .sk-hero__glow {
     animation: sk-breathe 5s ease-in-out infinite;
   }
-  .sk-bd__art,
-  .sk-plan__art {
+  .sk-bd__art {
     animation: sk-float 5s ease-in-out infinite;
   }
 
@@ -3209,6 +3457,103 @@
   }
   .sk-vs__promise.is-in em {
     background-size: 100% 100%;
+  }
+
+  /* 선택 이유 카드: 순차 등장 + 각 그림 애니메이션 */
+  .sk-why__card {
+    opacity: 0;
+    translate: 0 28px;
+    transition:
+      opacity 0.7s ease var(--d),
+      translate 0.8s var(--ease) var(--d),
+      transform 0.35s var(--ease),
+      box-shadow 0.35s ease;
+  }
+  .sk-why__card.is-in {
+    opacity: 1;
+    translate: 0 0;
+  }
+  .sk-why__ring-bar {
+    stroke-dashoffset: 100;
+    transition: stroke-dashoffset 1.8s var(--ease) 0.3s;
+  }
+  .sk-why__card.is-in .sk-why__ring-bar {
+    stroke-dashoffset: 0;
+  }
+  .sk-why__toast {
+    opacity: 0;
+    translate: 0 10px;
+    transition: opacity 0.5s ease, translate 0.6s var(--spring);
+  }
+  .sk-why__toast--a {
+    transition-delay: 0.5s;
+  }
+  .sk-why__toast--b {
+    transition-delay: 1.9s;
+  }
+  .sk-why__card.is-in .sk-why__toast {
+    opacity: 1;
+    translate: 0 0;
+  }
+  .sk-why__card.is-in .sk-why__toast--b {
+    animation: sk-float 4s ease-in-out 2.6s infinite;
+  }
+  .sk-why__big strong {
+    display: inline-block;
+    scale: 0.6;
+    opacity: 0;
+    transition: scale 0.8s var(--spring) 0.3s, opacity 0.5s ease 0.3s;
+  }
+  .sk-why__card.is-in .sk-why__big strong {
+    scale: 1;
+    opacity: 1;
+  }
+  .sk-why__pills li {
+    opacity: 0;
+    translate: 0 8px;
+    transition: opacity 0.4s ease, translate 0.5s var(--ease);
+  }
+  .sk-why__pills li:nth-child(2) {
+    transition-delay: 0.1s;
+  }
+  .sk-why__pills li:nth-child(3) {
+    transition-delay: 0.2s;
+  }
+  .sk-why__card.is-in .sk-why__pills li {
+    opacity: 1;
+    translate: 0 0;
+    transition-delay: calc(0.7s + var(--k, 0s));
+  }
+  .sk-why__coin--a {
+    animation: sk-float 4.5s ease-in-out infinite;
+  }
+  .sk-why__coin--b {
+    animation: sk-float 5s ease-in-out -2s infinite;
+  }
+  .sk-why__bar {
+    height: 0;
+    transition: height 1s var(--ease) calc(var(--i) * 0.18s + 0.3s);
+  }
+  .sk-why__card.is-in .sk-why__bar {
+    height: var(--h);
+  }
+  .sk-why__crown {
+    opacity: 0;
+    scale: 0.5;
+    transition: opacity 0.3s ease 1.2s, scale 0.5s var(--spring) 1.2s;
+  }
+  .sk-why__card.is-in .sk-why__crown {
+    opacity: 1;
+    scale: 1;
+  }
+  .sk-why__marquee-track {
+    animation: sk-marquee 16s linear infinite;
+  }
+  .sk-why__lens {
+    animation: sk-float 4.5s ease-in-out infinite;
+  }
+  .sk-why__pick {
+    animation: sk-pulse 2.4s ease-in-out infinite;
   }
 
   /* 단계 순차 등장 */
