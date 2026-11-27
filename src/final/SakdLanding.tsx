@@ -790,10 +790,21 @@ function Compare({ onConsult }: { onConsult: (from: string) => void }) {
         </div>
 
         <Reveal className="sk-vs__promise">
-          <p>
-            더 받은 곳이 있다면? <br className="sk-vs__br" />
-            <em>차액의 2배</em>로 돌려드립니다
-          </p>
+          <span aria-hidden="true" className="sk-vs__promise-icon">
+            <Icon name="shield" />
+          </span>
+          <div className="sk-vs__promise-body">
+            <p className="sk-vs__promise-text">
+              더 받은 곳이 있다면? <br className="sk-vs__br" />
+              <em>차액의 2배</em>로 돌려드립니다
+            </p>
+            <ul className="sk-vs__promise-tags">
+              <li>동일 날짜</li>
+              <li>동일 통신사</li>
+              <li>동일 요금제 기준</li>
+            </ul>
+          </div>
+          <span aria-hidden="true" className="sk-vs__promise-shine" />
         </Reveal>
         <ul className="sk-vs__notes">
           {COMPARE_NOTES.map((n) => (
