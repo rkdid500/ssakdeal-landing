@@ -544,13 +544,14 @@
 }
 .sk-lhero__line {
   display: block;
-  font-size: 38px;
+  font-size: clamp(28px, 9vw, 38px);
+  white-space: nowrap;
 }
 .sk-lhero__line--glow {
   position: relative;
   justify-self: center;
   padding-bottom: 10px;
-  font-size: 44px;
+  font-size: clamp(30px, 10.4vw, 44px);
   font-variant-numeric: tabular-nums;
   background: linear-gradient(90deg, #a6ffe0 0%, var(--mint) 35%, #7fa8ff 65%, #a6ffe0 100%);
   background-size: 200% 100%;
@@ -695,10 +696,10 @@
     padding-bottom: 88px;
   }
   .sk-lhero__line {
-    font-size: 54px;
+    font-size: 52px;
   }
   .sk-lhero__line--glow {
-    font-size: 64px;
+    font-size: 62px;
   }
   .sk-lhero__sub {
     font-size: 18px;
@@ -736,11 +737,11 @@
     margin-top: 18px;
   }
   .sk-lhero__line {
-    font-size: 60px;
+    font-size: clamp(44px, 4.2vw, 54px);
   }
   .sk-lhero__line--glow {
     justify-self: start;
-    font-size: 72px;
+    font-size: clamp(50px, 4.7vw, 62px);
   }
   .sk-lhero__line--glow::after {
     right: 0;
