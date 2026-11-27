@@ -2,7 +2,7 @@
  * 싹딜 인터넷 가입 랜딩 - 최종 버전 (반응형)
  *
  * - 정보 흐름: 히어로 → 금액 구성 → 타사 비교 → 선택 이유 → 사은품 → 후기 → 3단계 → FAQ → 상담 신청 (+ 하단 고정 상담 바)
- * - 디자인:    최싸몰 벤치마킹 랜딩형. 딥 네이비 + 싹딜 민트, 본문 Pretendard · 광고 문구 G마켓 산스
+ * - 디자인:    최싸몰 벤치마킹 랜딩형. 딥 네이비 + 블루 단일 강조, 본문 Pretendard · 광고 문구 G마켓 산스
  * - 반응형:    모바일 우선, 768px(태블릿)·1024px(데스크톱)에서 레이아웃 전환
  * - 외부 라이브러리 없음: React 내장 Hook + 순수 CSS(sakd-landing.css)만 사용
  *
@@ -52,10 +52,10 @@ const TRUST = [
 ] as const;
 
 /* 히어로 오른쪽(모바일은 아래)에서 흐르는 혜택 카드 */
-type HeroItem = { kind: "card"; label: string; amount: string; art: string } | { kind: "tile"; art: string; tone: "blue" | "mint" };
+type HeroItem = { kind: "card"; label: string; amount: string; art: string } | { kind: "tile"; art: string; tone: "blue" | "sky" };
 const HERO_CARDS: HeroItem[] = [
   { kind: "card", label: "인터넷+TV", amount: "47만원", art: "3d/router.webp" },
-  { kind: "tile", art: "3d/gift.webp", tone: "mint" },
+  { kind: "tile", art: "3d/gift.webp", tone: "sky" },
   { kind: "card", label: "휴대폰 개통", amount: "50만원", art: "3d/phone.webp" },
   { kind: "card", label: "총 지원금", amount: "138만원", art: "3d/moneybag.webp" },
   { kind: "tile", art: "3d/trophy.webp", tone: "blue" },
@@ -67,7 +67,7 @@ const HERO_CARDS: HeroItem[] = [
 
 /* 금액 구성 (예시 수치 - 실제 운영 기준으로 교체) */
 const BREAKDOWN = [
-  { label: "현금 지원금", sub: "설치 완료 후 입금", amount: 68, unit: "만원", tone: "mint" },
+  { label: "현금 지원금", sub: "설치 완료 후 입금", amount: 68, unit: "만원", tone: "main" },
   { label: "사은품", sub: "가전 1개 선택", amount: 40, unit: "만원 상당", tone: "blue" },
   { label: "휴대폰 결합 할인", sub: "3년 합계", amount: 30, unit: "만원", tone: "sky" },
 ] as const;
@@ -916,7 +916,7 @@ function Gifts({ asset, onOpenAll }: { asset: AssetFn; onOpenAll: () => void }) 
         </ul>
         <div className="sk-center">
           <button className="sk-btn sk-btn--outline" onClick={onOpenAll} type="button">
-            사은품 전체 보기 <span className="sk-mint-d">+{GIFTS_MORE.length}종</span>
+            사은품 전체 보기 <span className="sk-hl-d">+{GIFTS_MORE.length}종</span>
           </button>
           <p className="sk-fine sk-fine--center">가입 통신사에 따라 선택 가능한 사은품이 다를 수 있어요</p>
         </div>
@@ -1309,7 +1309,7 @@ function Apply({ asset, sectionRef }: { asset: AssetFn; sectionRef: RefObject<HT
             <h2 className="sk-h2" id="apply-title">
               비교는 다 해 보세요.
               <br />
-              마지막에 <span className="sk-mint">싹딜</span>에 물어보세요.
+              마지막에 <span className="sk-hl">싹딜</span>에 물어보세요.
             </h2>
           </Reveal>
           <ul className="sk-apply__points">
