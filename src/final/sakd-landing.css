@@ -934,6 +934,11 @@
   font-size: 15px;
   font-weight: 600;
 }
+.sk-bd__row dd.sk-bd__plus {
+  color: var(--accent);
+  font-size: 26px;
+  font-weight: 900;
+}
 .sk-bd__row:first-child dd {
   color: var(--accent-d);
 }
