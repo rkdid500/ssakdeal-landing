@@ -90,31 +90,42 @@ const COMPARE_NOTES = [
 ];
 
 /* 싹딜을 선택하는 이유 */
-const WHY = [
+const WHY: { n: string; title: string; body: string; note?: string; img: string; badge: string; icon: IconName }[] = [
   {
     n: "01",
     title: "설치 당일 1시간 이내 입금",
     body: "설치가 끝나면 1시간 안에 고객님 계좌로 바로 입금해 드려요.",
     note: "설치 완료 당일 기준",
+    img: "why/why-01.webp",
+    badge: "설치 완료 → 1시간 이내 입금",
+    icon: "bolt",
   },
   {
     n: "02",
     title: "차액 200% 보장",
     body: "다른 곳에서 더 받으셨다면 그 차액의 2배를 돌려드려요.",
     note: "동일 날짜 / 동일 통신사 / 동일 요금제 기준",
+    img: "why/why-02.webp",
+    badge: "더 받은 곳이 있다면 차액 2배",
+    icon: "shield",
   },
   {
     n: "03",
     title: "최고의 조건으로 싹-딜",
     body: "통신사별 조건을 모두 비교해 가장 많이 받는 조합으로 안내해요.",
+    img: "why/why-03.webp",
+    badge: "통신사별 조건 전부 비교",
+    icon: "check",
   },
   {
     n: "04",
     title: "내게 맞는 혜택 찾기",
     body: "사용 패턴과 가구원 수에 맞춰 꼭 필요한 상품만 정확하게 추천해요.",
+    img: "why/why-04.webp",
+    badge: "가구원 수 · 사용 패턴 맞춤",
+    icon: "users",
   },
 ];
-const WHY_CHIPS = ["인터넷", "TV", "휴대폰", "결합 할인", "1인 가구", "가족", "기가 인터넷", "사은품"];
 
 const GIFTS = [
   { img: "gifts/gift-tv.webp", brand: "삼성전자", name: "43인치 4K UHD TV" },
@@ -803,82 +814,17 @@ function Compare({ onConsult }: { onConsult: (from: string) => void }) {
 /* =====================================================================
  * 4. 싹딜을 선택하는 이유 (카드 4개, 화면에 들어오면 각 그림이 움직임)
  * ===================================================================== */
-function WhyVisual({ n, asset }: { n: string; asset: AssetFn }) {
-  if (n === "01")
-    return (
-      <div className="sk-why__vis sk-why__vis--timer">
-        <svg aria-hidden="true" className="sk-why__ring" viewBox="0 0 160 160">
-          <circle className="sk-why__ring-track" cx="80" cy="80" r="68" />
-          <circle className="sk-why__ring-bar" cx="80" cy="80" pathLength="100" r="68" />
-        </svg>
-        <div className="sk-why__timer-text">
-          <strong>1시간</strong>
-          <span>이내 입금</span>
-        </div>
-        <span className="sk-why__toast sk-why__toast--a">
-          <Icon name="check" />
-          설치 완료
-        </span>
-        <span className="sk-why__toast sk-why__toast--b">
-          <Icon name="wallet" />
-          입금 완료
-        </span>
-      </div>
-    );
-  if (n === "02")
-    return (
-      <div className="sk-why__vis sk-why__vis--guard">
-        <Art className="sk-why__coin sk-why__coin--a" size={110} src={asset("3d/coins.webp")} />
-        <Art className="sk-why__coin sk-why__coin--b" size={64} src={asset("3d/coins.webp")} />
-        <p className="sk-why__big">
-          차액
-          <strong>200%</strong>
-        </p>
-        <ul className="sk-why__pills">
-          <li>동일 날짜</li>
-          <li>동일 통신사</li>
-          <li>동일 요금제</li>
-        </ul>
-      </div>
-    );
-  if (n === "03")
-    return (
-      <div className="sk-why__vis sk-why__vis--bars">
-        <ul className="sk-why__bars">
-          <li style={{ "--h": "42%", "--i": 0 } as CSSProperties}>
-            <span className="sk-why__bar" />
-            <em>A업체</em>
-          </li>
-          <li style={{ "--h": "60%", "--i": 1 } as CSSProperties}>
-            <span className="sk-why__bar" />
-            <em>B업체</em>
-          </li>
-          <li className="is-ours" style={{ "--h": "100%", "--i": 2 } as CSSProperties}>
-            <span className="sk-why__crown">최고 조건</span>
-            <span className="sk-why__bar" />
-            <em>싹딜</em>
-          </li>
-        </ul>
-      </div>
-    );
+/** 힉스필드로 만든 고해상도 이미지 + 코드로 얹은 핵심 문구 배지 (글자는 코드라 선명하게 유지) */
+function WhyVisual({ item, asset }: { item: (typeof WHY)[number]; asset: AssetFn }) {
   return (
-    <div className="sk-why__vis sk-why__vis--match">
-      <div className="sk-why__marquee">
-        <div className="sk-why__marquee-track">
-          {[0, 1].map((k) => (
-            <span className="sk-why__marquee-set" key={k}>
-              {WHY_CHIPS.map((c) => (
-                <span className="sk-why__chip" key={c}>
-                  {c}
-                </span>
-              ))}
-            </span>
-          ))}
-        </div>
-      </div>
-      <span className="sk-why__pick">딱 맞는 혜택</span>
-      <Art className="sk-why__lens" size={200} src={asset("3d/magnifier.webp")} />
-    </div>
+    <>
+      <img alt="" className="sk-why__img" decoding="async" height={791} loading="lazy" src={asset(item.img)} width={1400} />
+      <span aria-hidden="true" className="sk-why__shine" />
+      <span className="sk-why__badge">
+        <Icon name={item.icon} />
+        {item.badge}
+      </span>
+    </>
   );
 }
 
@@ -919,7 +865,7 @@ function WhyCard({ item, asset, delay }: { item: (typeof WHY)[number]; asset: As
   return (
     <article className={`sk-why__card ${inView ? "is-in" : ""}`} ref={ref} style={{ "--d": `${delay}ms` } as CSSProperties}>
       <div aria-hidden="true" className="sk-why__media">
-        <WhyVisual asset={asset} n={item.n} />
+        <WhyVisual asset={asset} item={item} />
       </div>
       <div className="sk-why__body">
         <span className="sk-why__num">{item.n}</span>
