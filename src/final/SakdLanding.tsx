@@ -131,7 +131,6 @@ const GIFTS = [
 const GIFTS_MORE = [
   { cat: "생활가전", name: "삼성 비스포크 무선청소기" },
   { cat: "주방가전", name: "쿠쿠 IH 전기압력밥솥" },
-  { cat: "주방가전", name: "필립스 에어프라이어" },
 ];
 
 const STATS = [
