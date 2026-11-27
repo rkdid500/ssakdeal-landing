@@ -126,7 +126,6 @@ const GIFTS_MORE = [
 
 const STATS = [
   { label: "누적 상담 고객", value: 33000, suffix: "명+" },
-  { label: "제휴 판매점", value: 40, suffix: "곳+" },
   { label: "상담 후기", value: 20000, suffix: "건+" },
 ];
 

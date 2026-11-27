@@ -1982,7 +1982,10 @@
 }
 .sk-stats {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 640px;
+  margin-right: auto;
+  margin-left: auto;
   margin-bottom: 40px;
   padding: 22px 0;
   border-top: 1px solid var(--line-d);
