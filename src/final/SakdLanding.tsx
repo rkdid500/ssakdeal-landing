@@ -1,8 +1,8 @@
 /**
  * 싹딜 인터넷 가입 랜딩 - 최종 버전 (반응형)
  *
- * - 정보 흐름: 시안 1 (히어로 → 금액 구성 → 비교 → 가구별 견적 → 사은품 → 후기 → 3단계 → FAQ → 상담 신청)
- * - 디자인:    딥 네이비 + 싹딜 민트, Pretendard (sakd.co.kr 서체), 얇은 라인과 넉넉한 여백
+ * - 정보 흐름: 히어로 → 금액 구성 → 타사 비교 → 선택 이유 → 사은품 → 후기 → 3단계 → FAQ → 상담 신청 (+ 하단 고정 상담 바)
+ * - 디자인:    최싸몰 벤치마킹 랜딩형. 딥 네이비 + 싹딜 민트, 본문 Pretendard · 광고 문구 G마켓 산스
  * - 반응형:    모바일 우선, 768px(태블릿)·1024px(데스크톱)에서 레이아웃 전환
  * - 외부 라이브러리 없음: React 내장 Hook + 순수 CSS(sakd-landing.css)만 사용
  *
@@ -40,16 +40,8 @@ const SITE = {
   kakaoUrl: "#", // 카카오톡 채널 상담 링크
 };
 
-const NAV = [
-  { id: "breakdown", label: "혜택 구성" },
-  { id: "compare", label: "타사 비교" },
-  { id: "why", label: "선택 이유" },
-  { id: "gifts", label: "사은품" },
-  { id: "reviews", label: "고객 후기" },
-  { id: "faq", label: "자주 묻는 질문" },
-];
-
-const TICKER = ["설치 완료 후 1시간 내 입금", "차액 200% 보상", "인터넷 최대 138만원", "사은품 직접 선택", "상담만 받아도 괜찮아요"];
+/* 맨 위 한 줄 띠에 번갈아 나오는 문구 */
+const STRIP = ["같은 인터넷이라도, 받는 돈은 다르게", "설치 당일 1시간 이내 입금 완료", "더 받은 곳이 있다면 차액 200% 보장"];
 
 const HERO_MAX = 138; // 만원
 
@@ -58,6 +50,20 @@ const TRUST = [
   { icon: "shield", label: "차액 200% 보상" },
   { icon: "users", label: "누적 상담 3만명+" },
 ] as const;
+
+/* 히어로 오른쪽(모바일은 아래)에서 흐르는 혜택 카드 */
+type HeroItem = { kind: "card"; label: string; amount: string; art: string } | { kind: "tile"; art: string; tone: "blue" | "mint" };
+const HERO_CARDS: HeroItem[] = [
+  { kind: "card", label: "인터넷+TV", amount: "47만원", art: "3d/router.webp" },
+  { kind: "tile", art: "3d/gift.webp", tone: "mint" },
+  { kind: "card", label: "휴대폰 개통", amount: "50만원", art: "3d/phone.webp" },
+  { kind: "card", label: "총 지원금", amount: "138만원", art: "3d/moneybag.webp" },
+  { kind: "tile", art: "3d/trophy.webp", tone: "blue" },
+  { kind: "card", label: "차액 보상", amount: "200%", art: "3d/coins.webp" },
+  { kind: "card", label: "지급 시점", amount: "1시간 내", art: "3d/calendar.webp" },
+  { kind: "tile", art: "3d/router.webp", tone: "blue" },
+  { kind: "card", label: "비밀지원금", amount: "상담 시 공개", art: "3d/magnifier.webp" },
+];
 
 /* 금액 구성 (예시 수치 - 실제 운영 기준으로 교체) */
 const BREAKDOWN = [
@@ -439,7 +445,7 @@ function scrollToId(id: string) {
 }
 
 /* =====================================================================
- * 상단: 진행 바 + 공지 티커 + 헤더(모바일 메뉴 토글 / 데스크톱 메뉴)
+ * 상단 진행 바 + 문구 띠
  * ===================================================================== */
 function ScrollProgress() {
   const bar = useRef<HTMLDivElement>(null);
@@ -465,219 +471,95 @@ function ScrollProgress() {
   return <div aria-hidden="true" className="sk-progress" ref={bar} />;
 }
 
-function Ticker() {
+/** 맨 위 검은 띠. 문구가 3.5초마다 위로 바뀝니다 */
+function Strip() {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    if (prefersReducedMotion()) return;
+    const t = window.setInterval(() => setI((v) => (v + 1) % STRIP.length), 3500);
+    return () => window.clearInterval(t);
+  }, []);
   return (
-    <div className="sk-ticker">
-      <p className="sk-sr">{TICKER.join(", ")}</p>
-      <div aria-hidden="true" className="sk-ticker__track">
-        {[0, 1, 2].map((k) => (
-          <span className="sk-ticker__set" key={k}>
-            {TICKER.map((t) => (
-              <span className="sk-ticker__item" key={t}>
-                {t}
-              </span>
-            ))}
-          </span>
-        ))}
-      </div>
+    <div className="sk-strip">
+      <p aria-live="off" className="sk-strip__text" key={i}>
+        {STRIP[i]}
+      </p>
     </div>
   );
 }
 
-function Header({ asset, onConsult }: { asset: AssetFn; onConsult: (from: string) => void }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const scrolled = useScrolledPast(24);
-  const desktop = useMedia("(min-width: 1024px)");
-  const close = useCallback(() => setMenuOpen(false), []);
-  useBodyLock(menuOpen && !desktop);
-  useEscape(menuOpen, close);
-  useEffect(() => {
-    if (desktop) setMenuOpen(false);
-  }, [desktop]);
-
-  const solid = scrolled || menuOpen;
-  return (
-    <header className={`sk-header ${solid ? "is-solid" : ""} ${menuOpen ? "is-menu" : ""}`}>
-      <div className="sk-wrap sk-header__bar">
-        <a
-          aria-label={`${SITE.name} 처음으로`}
-          className="sk-header__logo"
-          href="#top"
-          onClick={(e) => {
-            e.preventDefault();
-            close();
-            window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" });
-          }}
-        >
-          <img alt={SITE.name} className="sk-logo sk-logo--white" height={28} src={asset("brand/logo-white.webp")} width={56} />
-          <img alt="" aria-hidden="true" className="sk-logo sk-logo--color" height={28} src={asset("brand/logo-color.webp")} width={56} />
-        </a>
-
-        <nav aria-label="주요 메뉴" className="sk-gnb">
-          {NAV.map((item) => (
-            <a
-              href={`#${item.id}`}
-              key={item.id}
-              onClick={(e) => {
-                e.preventDefault();
-                scrollToId(item.id);
-              }}
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
-
-        <div className="sk-header__right">
-          <a className="sk-header__tel" href={`tel:${SITE.phoneTel}`}>
-            <Icon name="call" />
-            {SITE.phone}
-          </a>
-          <button className="sk-header__cta" onClick={() => onConsult("header")} type="button">
-            상담 신청
-          </button>
-          <button
-            aria-controls="sk-menu"
-            aria-expanded={menuOpen}
-            aria-label={menuOpen ? "메뉴 닫기" : "메뉴 열기"}
-            className="sk-burger"
-            onClick={() => setMenuOpen((v) => !v)}
-            type="button"
-          >
-            <span />
-            <span />
-            <span />
-          </button>
-        </div>
+/* =====================================================================
+ * 1. 히어로 (랜딩형: 광고 문구 + 흐르는 혜택 카드)
+ * ===================================================================== */
+function HeroCard({ item, asset }: { item: HeroItem; asset: AssetFn }) {
+  if (item.kind === "tile") {
+    return (
+      <div className={`sk-hcard sk-hcard--tile sk-hcard--${item.tone}`}>
+        <Art eager size={140} src={asset(item.art)} />
       </div>
-
-      <nav aria-label="페이지 메뉴" className="sk-menu" id="sk-menu" inert={!menuOpen}>
-        <ul className="sk-menu__list">
-          {NAV.map((item, i) => (
-            <li key={item.id} style={{ "--i": i } as CSSProperties}>
-              <a
-                className="sk-menu__link"
-                href={`#${item.id}`}
-                onClick={(e) => {
-                  e.preventDefault();
-                  close();
-                  scrollToId(item.id);
-                }}
-              >
-                <span className="sk-menu__num">{String(i + 1).padStart(2, "0")}</span>
-                {item.label}
-                <Arrow />
-              </a>
-            </li>
-          ))}
-        </ul>
-        <a className="sk-menu__call" href={`tel:${SITE.phoneTel}`}>
-          <Icon name="call" />
-          전화 상담 <strong>{SITE.phone}</strong>
-        </a>
-      </nav>
-      <button aria-hidden="true" className="sk-menu__dim" onClick={close} tabIndex={-1} type="button" />
-    </header>
+    );
+  }
+  return (
+    <div className="sk-hcard">
+      <p className="sk-hcard__label">{item.label}</p>
+      <p className={`sk-hcard__amount ${item.amount.length > 5 ? "sk-hcard__amount--sm" : ""}`}>{item.amount}</p>
+      <span className="sk-hcard__art">
+        <Art eager size={96} src={asset(item.art)} />
+      </span>
+    </div>
   );
 }
 
-/* =====================================================================
- * 1. 히어로 (카운트업 + 마우스 패럴랙스)
- * ===================================================================== */
-function Hero({
-  asset,
-  onConsult,
-  ctaRef,
-}: {
-  asset: AssetFn;
-  onConsult: (from: string) => void;
-  ctaRef: RefObject<HTMLButtonElement | null>;
-}) {
-  const stage = useRef<HTMLDivElement>(null);
+function Hero({ asset, onConsult }: { asset: AssetFn; onConsult: (from: string) => void }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     const t = requestAnimationFrame(() => setMounted(true));
     return () => cancelAnimationFrame(t);
   }, []);
-
-  const onMove = (e: ReactPointerEvent<HTMLElement>) => {
-    if (e.pointerType !== "mouse" || prefersReducedMotion() || !stage.current) return;
-    const r = e.currentTarget.getBoundingClientRect();
-    stage.current.style.setProperty("--mx", (((e.clientX - r.left) / r.width) * 2 - 1).toFixed(3));
-    stage.current.style.setProperty("--my", (((e.clientY - r.top) / r.height) * 2 - 1).toFixed(3));
-  };
-  const onLeave = () => {
-    stage.current?.style.setProperty("--mx", "0");
-    stage.current?.style.setProperty("--my", "0");
-  };
+  const cols = [0, 1, 2].map((c) => HERO_CARDS.filter((_, i) => i % 3 === c));
+  const rowCards = HERO_CARDS.filter((c) => c.kind === "card");
 
   return (
-    <section className={`sk-hero ${mounted ? "is-in" : ""}`} id="hero" onPointerLeave={onLeave} onPointerMove={onMove}>
-      <div aria-hidden="true" className="sk-hero__grid-bg" />
-      <div className="sk-wrap sk-hero__layout">
-        <div className="sk-hero__copy">
-          <p className="sk-hero__eyebrow">
-            <span className="sk-dot-live" />
-            인터넷 · TV · 휴대폰 결합 상담
+    <section className={`sk-lhero ${mounted ? "is-in" : ""}`} id="hero">
+      <div className="sk-wrap sk-lhero__layout">
+        <div className="sk-lhero__copy">
+          <img alt={SITE.name} className="sk-lhero__logo" height={30} src={asset("brand/logo-white.webp")} width={60} />
+          <p className="sk-lhero__eyebrow">
+            인터넷 · TV · 휴대폰 가입할 때
+            <span className="sk-lhero__mascot">
+              <Art eager size={44} src={asset("brand/ssak-03.webp")} />
+            </span>
           </p>
-          <h1 className="sk-hero__title">
-            인터넷 바꾸고,
-            <br />
-            놓쳤던 지원금 <span className="sk-mint">싹</span> 받아가세요
+          <h1 className="sk-lhero__title">
+            <span className="sk-lhero__line">인터넷 바꾸고,</span>
+            <span className="sk-lhero__line sk-lhero__line--glow">
+              최대 <CountUp duration={1500} run={mounted} to={HERO_MAX} />
+              만원 싹-!
+            </span>
           </h1>
-          <div className="sk-hero__amount">
-            <span className="sk-hero__max">최대</span>
-            <strong>
-              <CountUp duration={1500} run={mounted} to={HERO_MAX} />
-            </strong>
-            <span className="sk-hero__unit">만원</span>
-          </div>
-          <a
-            className="sk-hero__link"
-            href="#breakdown"
-            onClick={(e) => {
-              e.preventDefault();
-              scrollToId("breakdown");
-            }}
-          >
-            인터넷 + TV + 휴대폰 결합 기준 · 구성 보기
-          </a>
-        </div>
+          <p className="sk-lhero__sub">
+            정확한 요금 설계부터 숨은 비밀지원금까지
+            <br />
+            싹딜이 한 번에, 끝까지 책임집니다.
+          </p>
 
-        <div aria-hidden="true" className="sk-hero__visual" ref={stage}>
-          <span className="sk-hero__ring sk-hero__ring--1" />
-          <span className="sk-hero__ring sk-hero__ring--2" />
-          <span className="sk-hero__glow" />
-          <Art className="sk-hero__router sk-layer" eager size={320} src={asset("3d/router.webp")} />
-          <Art className="sk-hero__coins sk-layer sk-layer--far" eager size={120} src={asset("3d/coins.webp")} />
-          <div className="sk-hero__float sk-hero__float--a sk-layer sk-layer--near">
-            <Icon name="bolt" />
-            <span>
-              <small>지급 시점</small>
-              설치 후 1시간 내
-            </span>
+          <div aria-hidden="true" className="sk-lhero__row">
+            <div className="sk-lhero__row-track">
+              {[0, 1].map((k) => (
+                <div className="sk-lhero__row-set" key={k}>
+                  {rowCards.map((c, i) => (
+                    <HeroCard asset={asset} item={c} key={i} />
+                  ))}
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="sk-hero__float sk-hero__float--b sk-layer sk-layer--far">
-            <Icon name="shield" />
-            <span>
-              <small>차액 보상</small>
-              최대 200%
-            </span>
-          </div>
-        </div>
 
-        <div className="sk-hero__action">
-          <div className="sk-hero__btns">
-            <button className="sk-btn sk-btn--primary sk-btn--lg" onClick={() => onConsult("hero")} ref={ctaRef} type="button">
-              내 지원금 확인하기
-              <Arrow />
-            </button>
-            <a className="sk-btn sk-btn--ghost sk-btn--lg sk-hide-m" href={`tel:${SITE.phoneTel}`}>
-              <Icon name="call" />
-              {SITE.phone}
-            </a>
-          </div>
-          <ul className="sk-hero__trust">
+          <button className="sk-btn sk-btn--primary sk-btn--lg sk-lhero__cta" onClick={() => onConsult("hero")} type="button">
+            최대 지원금 받기
+            <Arrow />
+          </button>
+          <ul className="sk-lhero__trust">
             {TRUST.map((t) => (
               <li key={t.label}>
                 <Icon name={t.icon} />
@@ -685,6 +567,18 @@ function Hero({
               </li>
             ))}
           </ul>
+        </div>
+
+        <div aria-hidden="true" className="sk-lhero__wall">
+          {cols.map((col, c) => (
+            <div className={`sk-lhero__col sk-lhero__col--${c + 1}`} key={c}>
+              <div className="sk-lhero__col-track">
+                {[...col, ...col].map((item, i) => (
+                  <HeroCard asset={asset} item={item} key={i} />
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
@@ -1612,36 +1506,112 @@ function Sheet({
 }
 
 /* =====================================================================
- * 하단 고정 CTA + 맨 위로
+ * 하단 고정 상담 바 (최싸몰형: 상품·이름·연락처·동의를 바로 입력) + 맨 위로
  * ===================================================================== */
-function StickyCta({ show, onConsult }: { show: boolean; onConsult: (from: string) => void }) {
+function LeadBar({ asset }: { asset: AssetFn }) {
+  const [product, setProduct] = useState("");
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [agree, setAgree] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [toast, setToast] = useState<{ ok: boolean; text: string; id: number } | null>(null);
+
+  useEffect(() => {
+    if (!toast) return;
+    const t = window.setTimeout(() => setToast(null), 3200);
+    return () => window.clearTimeout(t);
+  }, [toast]);
+
+  const say = (ok: boolean, text: string) => setToast({ ok, text, id: Date.now() });
+
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (sending) return;
+    if (!product) return say(false, "관심 상품을 선택해 주세요.");
+    if (name.trim().length < 2) return say(false, "성함을 2자 이상 입력해 주세요.");
+    if (!PHONE_RE.test(phone)) return say(false, "연락처를 010-1234-5678 형식으로 입력해 주세요.");
+    if (!agree) return say(false, "개인정보 수집·이용에 동의해 주세요.");
+    setSending(true);
+    try {
+      await submitLead({ product, name: name.trim(), phone, plan: "", from: "bar" });
+      say(true, "상담 신청이 접수됐어요. 곧 연락드릴게요!");
+      setProduct("");
+      setName("");
+      setPhone("");
+      setAgree(false);
+    } catch {
+      say(false, "신청을 보내지 못했어요. 전화로 문의해 주세요.");
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
-    <div className={`sk-sticky ${show ? "is-show" : ""}`} inert={!show}>
-      <div className="sk-sticky__inner">
-        <a aria-label="카카오톡 상담" className="sk-sticky__kakao" href={SITE.kakaoUrl}>
-          <Icon name="chat" />
-        </a>
-        <a className="sk-sticky__tel" href={`tel:${SITE.phoneTel}`}>
+    <form aria-label="빠른 상담 신청" className="sk-bar" noValidate onSubmit={onSubmit}>
+      <p
+        aria-live="polite"
+        className={`sk-bar__toast ${toast ? "is-show" : ""} ${toast?.ok ? "is-ok" : ""}`}
+        key={toast?.id ?? 0}
+        role="status"
+      >
+        {toast?.text}
+      </p>
+      <div className="sk-bar__inner">
+        <Art className="sk-bar__art" size={110} src={asset("3d/phone.webp")} />
+        <a className="sk-bar__tel" href={`tel:${SITE.phoneTel}`}>
           <Icon name="call" />
-          <span>
-            <small>전화 상담</small>
-            {SITE.phone}
-          </span>
+          {SITE.phone}
         </a>
-        <button className="sk-btn sk-btn--primary sk-sticky__btn" onClick={() => onConsult("sticky")} type="button">
-          내 지원금 1분 만에 확인하기
-        </button>
+        <label className="sk-bar__agree">
+          <input checked={agree} className="sk-bar__check" onChange={(e) => setAgree(e.target.checked)} type="checkbox" />
+          <span aria-hidden="true" className="sk-bar__box">
+            <Icon name="check" />
+          </span>
+          <span className="sk-bar__agree-text">개인정보 수집·이용 동의</span>
+        </label>
+        <div className="sk-bar__fields">
+          <select aria-label="관심 상품" className="sk-bar__input sk-bar__select" onChange={(e) => setProduct(e.target.value)} value={product}>
+            <option value="">상품 선택</option>
+            {PRODUCTS.map((p) => (
+              <option key={p.value} value={p.value}>
+                {p.value}
+              </option>
+            ))}
+          </select>
+          <input
+            aria-label="성함"
+            autoComplete="name"
+            className="sk-bar__input"
+            maxLength={20}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="성함"
+            value={name}
+          />
+          <input
+            aria-label="연락처"
+            autoComplete="tel"
+            className="sk-bar__input"
+            inputMode="numeric"
+            onChange={(e) => setPhone(formatPhone(e.target.value))}
+            placeholder="연락처"
+            type="tel"
+            value={phone}
+          />
+          <button className="sk-bar__submit" disabled={sending} type="submit">
+            {sending ? "접수 중" : "상담신청"}
+          </button>
+        </div>
       </div>
-    </div>
+    </form>
   );
 }
 
-function ToTop({ lifted }: { lifted: boolean }) {
+function ToTop() {
   const show = useScrolledPast(900);
   return (
     <button
       aria-label="맨 위로"
-      className={`sk-totop ${show ? "is-show" : ""} ${lifted ? "is-lifted" : ""}`}
+      className={`sk-totop ${show ? "is-show" : ""}`}
       onClick={() => window.scrollTo({ top: 0, behavior: prefersReducedMotion() ? "auto" : "smooth" })}
       tabIndex={show ? 0 : -1}
       type="button"
@@ -1661,8 +1631,6 @@ export default function SakdLanding({ assetBase = "/assets/" }: { assetBase?: st
 
   const [sheet, setSheet] = useState({ open: false, from: "", plan: "" });
   const [giftsOpen, setGiftsOpen] = useState(false);
-  const [showSticky, setShowSticky] = useState(false);
-  const heroCta = useRef<HTMLButtonElement>(null);
   const applyRef = useRef<HTMLElement>(null);
 
   const openConsult = useCallback((from: string, plan = "") => {
@@ -1672,40 +1640,12 @@ export default function SakdLanding({ assetBase = "/assets/" }: { assetBase?: st
   const closeConsult = useCallback(() => setSheet((s) => ({ ...s, open: false })), []);
   const closeGifts = useCallback(() => setGiftsOpen(false), []);
 
-  /* 히어로 버튼을 지나치면 하단 CTA 등장, 마지막 신청 폼이 보이면 숨김 */
-  useEffect(() => {
-    const cta = heroCta.current;
-    const apply = applyRef.current;
-    if (!cta || !apply || !("IntersectionObserver" in window)) return;
-    let pastHero = false;
-    let atApply = false;
-    const sync = () => setShowSticky(pastHero && !atApply);
-    const io1 = new IntersectionObserver(([e]) => {
-      pastHero = !e.isIntersecting && e.boundingClientRect.top < 0;
-      sync();
-    });
-    const io2 = new IntersectionObserver(
-      ([e]) => {
-        atApply = e.isIntersecting;
-        sync();
-      },
-      { threshold: 0.1 },
-    );
-    io1.observe(cta);
-    io2.observe(apply);
-    return () => {
-      io1.disconnect();
-      io2.disconnect();
-    };
-  }, []);
-
   return (
     <div className="sk" id="top">
       <ScrollProgress />
-      <Ticker />
-      <Header asset={asset} onConsult={openConsult} />
+      <Strip />
       <main>
-        <Hero asset={asset} ctaRef={heroCta} onConsult={openConsult} />
+        <Hero asset={asset} onConsult={openConsult} />
         <Breakdown asset={asset} onConsult={openConsult} />
         <Compare onConsult={openConsult} />
         <Why asset={asset} onConsult={openConsult} />
@@ -1717,8 +1657,8 @@ export default function SakdLanding({ assetBase = "/assets/" }: { assetBase?: st
       </main>
       <Footer asset={asset} />
 
-      <StickyCta onConsult={openConsult} show={showSticky} />
-      <ToTop lifted={showSticky} />
+      <LeadBar asset={asset} />
+      <ToTop />
 
       <Sheet onClose={closeConsult} open={sheet.open} sub="상담사가 내 조건 실수령액을 알려 드려요" title="내 지원금 확인하기">
         <LeadForm asset={asset} from={sheet.from} key={`${sheet.from}-${sheet.plan}`} plan={sheet.plan} />
