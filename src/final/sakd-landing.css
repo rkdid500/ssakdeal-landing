@@ -957,7 +957,7 @@
   --vs-blue: #2f6bff;
   --vs-blue-d: #2a62f5;
   --vs-yellow: #ffe14d;
-  --vs-yellow-l: #fff0a0;
+  --vs-yellow-l: #ffe14d;
   --vs-gray-h: #cbd5e1;
   --vs-gray: #e2e8f0;
   --vs-line: #d3dae5;
@@ -1165,15 +1165,9 @@
 .sk-vs__val--hl,
 .sk-vs__val--total {
   color: var(--vs-yellow);
-  background: linear-gradient(180deg, #fffbd6 0%, #ffe95e 45%, #ffd21f 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 12px rgba(255, 216, 40, 0.35));
 }
 .sk-vs__val--total {
   font-size: 46px;
-  background-image: linear-gradient(180deg, #fffde8 0%, #fff07a 45%, #ffdc33 100%);
 }
 .sk-vs__subtxt {
   margin-top: 8px;
@@ -1240,14 +1234,10 @@
 .sk-vs__promise em {
   position: relative;
   display: inline-block;
+  color: #ffe14d;
   font-size: 1.18em;
   font-style: normal;
   font-weight: 900;
-  background: linear-gradient(180deg, #fffbd6 0%, #ffe95e 45%, #ffd21f 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 2px 10px rgba(255, 216, 40, 0.4));
 }
 .sk-vs__promise em::after {
   position: absolute;
