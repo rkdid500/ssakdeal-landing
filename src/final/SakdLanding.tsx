@@ -561,10 +561,6 @@ function Hero({ asset, onConsult }: { asset: AssetFn; onConsult: (from: string) 
             </div>
           </div>
 
-          <button className="sk-btn sk-btn--primary sk-btn--lg sk-lhero__cta" onClick={() => onConsult("hero")} type="button">
-            최대 지원금 받기
-            <Arrow />
-          </button>
           <ul className="sk-lhero__trust">
             {TRUST.map((t) => (
               <li key={t.label}>
