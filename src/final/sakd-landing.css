@@ -956,8 +956,8 @@
 .sk-vs {
   --vs-blue: #2563eb;
   --vs-blue-d: #1d4ed8;
-  --vs-yellow: #ffd84a;
-  --vs-yellow-l: #fde68a;
+  --vs-yellow: #ffe14d;
+  --vs-yellow-l: #fff0a0;
   --vs-gray-h: #cbd5e1;
   --vs-gray: #e2e8f0;
   --vs-line: #d3dae5;
@@ -1116,13 +1116,13 @@
   filter: brightness(1.08);
 }
 .sk-vs__cell--secret {
-  background: #3d6cd6;
+  background: #3b7bff;
 }
 .sk-vs__col--ours .sk-vs__cell--total {
   position: relative;
   height: calc(var(--th) + var(--drop));
   overflow: hidden;
-  background: linear-gradient(180deg, var(--vs-blue-d), #1e3a9e);
+  background: linear-gradient(180deg, #1f55e6, #1840c4);
   border-top: 2px solid rgba(255, 255, 255, 0.22);
   border-radius: 0 0 33px 33px;
 }
@@ -1137,9 +1137,9 @@
   font-weight: 900;
   letter-spacing: -0.03em;
   white-space: nowrap;
-  background: #fbbf24;
+  background: linear-gradient(180deg, #ffe55c, #ffd21f);
   border-radius: 999px;
-  box-shadow: 0 8px 20px rgba(251, 191, 36, 0.4);
+  box-shadow: 0 8px 20px rgba(255, 210, 31, 0.45);
   translate: -50% 0;
 }
 .sk-vs__eng {
@@ -1162,12 +1162,18 @@
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
-.sk-vs__val--hl {
+.sk-vs__val--hl,
+.sk-vs__val--total {
   color: var(--vs-yellow);
+  background: linear-gradient(180deg, #fffbd6 0%, #ffe95e 45%, #ffd21f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 12px rgba(255, 216, 40, 0.35));
 }
 .sk-vs__val--total {
-  color: var(--vs-yellow-l);
   font-size: 46px;
+  background-image: linear-gradient(180deg, #fffde8 0%, #fff07a 45%, #ffdc33 100%);
 }
 .sk-vs__subtxt {
   margin-top: 8px;
