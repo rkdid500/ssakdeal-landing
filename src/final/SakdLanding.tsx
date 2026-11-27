@@ -1,7 +1,7 @@
 /**
  * 싹딜 인터넷 가입 랜딩 - 최종 버전 (반응형)
  *
- * - 정보 흐름: 히어로 → 금액 구성 → 타사 비교 → 선택 이유 → 사은품 → 후기 → 3단계 → FAQ → 상담 신청 (+ 하단 고정 상담 바)
+ * - 정보 흐름: 히어로 → 타사 비교 → 선택 이유 → 사은품 → 후기 → 3단계 → FAQ → 상담 신청 (+ 하단 고정 상담 바)
  * - 디자인:    최싸몰 벤치마킹 랜딩형. 딥 네이비 + 블루 단일 강조, 본문 Pretendard · 광고 문구 G마켓 산스
  * - 반응형:    모바일 우선, 768px(태블릿)·1024px(데스크톱)에서 레이아웃 전환
  * - 외부 라이브러리 없음: React 내장 Hook + 순수 CSS(sakd-landing.css)만 사용
@@ -66,12 +66,6 @@ const HERO_CARDS: HeroItem[] = [
 ];
 
 /* 금액 구성 (예시 수치 - 실제 운영 기준으로 교체) */
-/* 혜택 구성. amount가 null이면 금액 대신 text를 보여 줍니다 (비밀지원금 +@) */
-const BREAKDOWN: { label: string; sub: string; amount: number | null; text?: string; unit: string; tone: "main" | "blue" | "sky" }[] = [
-  { label: "인터넷+TV", sub: "통신사별 상이", amount: 47, unit: "만원", tone: "main" },
-  { label: "USIM", sub: "USIM 개통 기준", amount: 50, unit: "만원", tone: "blue" },
-  { label: "비밀지원금", sub: "상담 시 공개", amount: null, text: "+@", unit: "", tone: "sky" },
-];
 
 /* 타사 비교 (타사 수치는 자사 조사 기준) */
 type IconName = "wifi" | "phone" | "lock" | "bolt" | "shield" | "wallet" | "users" | "check" | "chat" | "call" | "gift";
@@ -592,91 +586,6 @@ function Hero({ asset, onConsult }: { asset: AssetFn; onConsult: (from: string) 
             </div>
           ))}
         </div>
-      </div>
-    </section>
-  );
-}
-
-/* =====================================================================
- * 2. 138만원 구성 (막대 성장 + 카운트업)
- * ===================================================================== */
-function Breakdown({ asset, onConsult }: { asset: AssetFn; onConsult: (from: string) => void }) {
-  const [ref, inView] = useInView<HTMLDivElement>({ threshold: 0.3 });
-  const total = HERO_MAX;
-  const known = BREAKDOWN.reduce((sum, b) => sum + (b.amount ?? 0), 0);
-  /* 막대 길이: 금액이 있는 항목은 금액 비율, 비밀지원금은 최대 금액의 나머지 */
-  const share = (b: (typeof BREAKDOWN)[number]) => ((b.amount ?? Math.max(total - known, 0)) / total) * 100;
-  return (
-    <section aria-labelledby="breakdown-title" className="sk-sec sk-sec--light" id="breakdown">
-      <div className="sk-wrap sk-split">
-        <div className="sk-split__side">
-          <Reveal className="sk-head sk-head--left">
-            <p className="sk-kicker">혜택 구성</p>
-            <h2 className="sk-h2" id="breakdown-title">
-              광고에서 본 {HERO_MAX}만원,
-              <br />
-              이렇게 받아요
-            </h2>
-            <p className="sk-lead">
-              인터넷+TV, USIM 지원금에 <strong>비밀지원금까지</strong> 더해 드려요.
-              <br className="sk-hide-m" /> 내 조건 금액은 상담으로 1분 만에 확인하세요.
-            </p>
-          </Reveal>
-          <button className="sk-btn sk-btn--primary sk-hide-m sk-split__cta" onClick={() => onConsult("breakdown")} type="button">
-            내 조건 금액 확인하기
-            <Arrow />
-          </button>
-        </div>
-
-        <div className={`sk-card sk-bd ${inView ? "is-in" : ""}`} ref={ref}>
-          <div className="sk-bd__top">
-            <p className="sk-bd__caption">예상 혜택 합계</p>
-            <p className="sk-bd__total">
-              <span>최대</span>
-              <CountUp duration={1600} run={inView} to={total} />
-              <span>만원</span>
-            </p>
-          </div>
-          <div aria-hidden="true" className="sk-bd__bar">
-            {BREAKDOWN.map((b, i) => (
-              <span
-                className={`sk-bd__seg sk-bd__seg--${b.tone}`}
-                key={b.label}
-                style={{ "--w": `${share(b)}%`, "--d": `${i * 160}ms` } as CSSProperties}
-              />
-            ))}
-          </div>
-          <dl className="sk-bd__list">
-            {BREAKDOWN.map((b) => (
-              <div className="sk-bd__row" key={b.label}>
-                <dt>
-                  <i className={`sk-bd__dot sk-bd__dot--${b.tone}`} />
-                  <span>
-                    {b.label}
-                    <small>{b.sub}</small>
-                  </span>
-                </dt>
-                <dd className={b.amount === null ? "sk-bd__plus" : undefined}>
-                  {b.amount === null ? (
-                    b.text
-                  ) : (
-                    <>
-                      <CountUp run={inView} to={b.amount} />
-                      <span>{b.unit}</span>
-                    </>
-                  )}
-                </dd>
-              </div>
-            ))}
-          </dl>
-          <p className="sk-fine">비밀지원금은 상담 시 공개되며, 가입 조건에 따라 달라질 수 있어요.</p>
-          <Art className="sk-bd__art" size={120} src={asset("3d/moneybag.webp")} />
-        </div>
-
-        <button className="sk-btn sk-btn--primary sk-show-m" onClick={() => onConsult("breakdown")} type="button">
-          내 조건 금액 확인하기
-          <Arrow />
-        </button>
       </div>
     </section>
   );
@@ -1613,7 +1522,6 @@ export default function SakdLanding({ assetBase = "/assets/" }: { assetBase?: st
       <Strip />
       <main>
         <Hero asset={asset} onConsult={openConsult} />
-        <Breakdown asset={asset} onConsult={openConsult} />
         <Compare onConsult={openConsult} />
         <Why asset={asset} onConsult={openConsult} />
         <Gifts asset={asset} onOpenAll={() => setGiftsOpen(true)} />
