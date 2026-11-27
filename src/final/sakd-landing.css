@@ -1165,6 +1165,10 @@
 .sk-vs__val--hl,
 .sk-vs__val--total {
   color: var(--vs-yellow);
+  background: linear-gradient(180deg, #fff6b8 0%, #ffe54d 50%, #ffcf1a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .sk-vs__val--total {
   font-size: 46px;
@@ -1238,6 +1242,10 @@
   font-size: 1.18em;
   font-style: normal;
   font-weight: 900;
+  background: linear-gradient(180deg, #fff6b8 0%, #ffe54d 50%, #ffcf1a 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 .sk-vs__promise em::after {
   position: absolute;
