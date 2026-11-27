@@ -123,7 +123,7 @@ const WHY: { n: string; title: string; body: string; note?: string; img: string;
 ];
 
 const GIFTS = [
-  { img: "gifts/gift-tv.webp", brand: "삼성전자", name: "43인치 4K UHD TV" },
+  { img: "gifts/gift-tv.webp", brand: "삼성전자", name: "55인치 크리스탈 UHD TV" },
   { img: "gifts/gift-vacuum.webp", brand: "LG전자", name: "오브제컬렉션 스틱청소기" },
   { img: "gifts/gift-purifier.webp", brand: "LG전자", name: "퓨리케어 AI 공기청정기" },
   { img: "gifts/gift-washer.webp", brand: "삼성전자", name: "드럼세탁기 9kg" },
