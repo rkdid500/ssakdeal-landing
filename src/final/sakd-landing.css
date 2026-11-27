@@ -2782,7 +2782,8 @@
   box-shadow: 0 0 0 3px rgba(28, 208, 146, 0.3);
 }
 .sk-bar__select {
-  padding-right: 22px;
+  padding: 0 20px 0 9px;
+  font-size: 14px;
   text-align: left;
   appearance: none;
   background:
@@ -2853,6 +2854,8 @@
   .sk-bar__select {
     flex: 1.1;
     order: 1;
+    padding: 0 26px 0 14px;
+    font-size: 15px;
   }
   .sk-bar__input {
     flex: 1;
